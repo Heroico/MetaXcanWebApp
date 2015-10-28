@@ -7,7 +7,12 @@ from metaxcan_api.views import CreateUserView
 router = DefaultRouter()
 
 urlpatterns = [
-    #url(r'^', include(router.urls)),
+    url(r'^', include(router.urls)),
     url(r'^users/create/$', CreateUserView.as_view()),
     url(r'^token/', views.obtain_auth_token),
+]
+
+urlpatterns += [
+    url(r'^api-auth/', include('rest_framework.urls',
+                               namespace='rest_framework')),
 ]

@@ -1,6 +1,7 @@
 __author__ = 'heroico'
 from rest_framework import serializers
 from django.contrib.auth.models import User
+from rest_framework.authtoken.models import Token
 
 #http://stackoverflow.com/questions/16857450/how-to-register-users-in-django-rest-framework
 class UserSerializer(serializers.HyperlinkedModelSerializer):
@@ -22,3 +23,18 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         user.save()
 
         return user
+
+class CreateUserSerializer(UserSerializer):
+    token = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = ('id', 'username', 'password', 'email', 'token', )
+        extra_kwargs = {'password': {'write_only': True}}
+        read_only_fields = ('id', 'token',)
+
+    def get_token(self, validated_data):
+        #where we populate the 'token' field above
+        user = User.objects.filter(email=validated_data.email)
+        token = Token.objects.get(user=user)
+        return token.key

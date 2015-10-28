@@ -1,0 +1,4 @@
+*.pyc
+*migrations
+.idea
+req.txt

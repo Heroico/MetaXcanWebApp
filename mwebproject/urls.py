@@ -15,9 +15,11 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
-from metaxcan_api import urls as metaxcan_urls
+from metaxcan_api import urls as api_urls
+from metaxcan_client import urls as client_urls
 
 urlpatterns = [
-    url(r'^api/', include(metaxcan_urls)),
+    url(r'^api/', include(api_urls)),
+    url(r'^app/', include(client_urls)),
     url(r'^admin/', include(admin.site.urls)),
 ]

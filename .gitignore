@@ -2,3 +2,15 @@
 *migrations
 .idea
 req.txt
+
+# Node modules
+node_modules/
+
+# Bower components
+*bower_components*
+
+# Uglified JavaScript
+dist/
+
+# Staticfiles
+staticfiles/

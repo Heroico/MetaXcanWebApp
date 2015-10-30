@@ -14,9 +14,9 @@
                 controller: 'LoginCtrl',
                 controllerAs: 'vm',
             }).
-            when('/register', {
-                templateUrl: 'static/app/partials/register.html',
-                controller: 'RegisterCtrl',
+            when('/signup', {
+                templateUrl: 'static/app/partials/signup.html',
+                controller: 'SignUpCtrl',
                 controllerAs: 'vm',
             }).
             otherwise({

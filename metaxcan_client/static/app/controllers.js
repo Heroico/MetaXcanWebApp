@@ -3,12 +3,28 @@
 
     /* Controllers */
     angular.module('metaxcanClientControllers', [])
-        .controller('HomeCtrl', home)
-        .controller('LoginCtrl', login)
-        .controller('SignUpCtrl', signUp);
+        .controller('HomeCtrl', ["$scope", home])
+        .controller('LoginCtrl', ["$scope", login])
+        .controller('SignUpCtrl', ["$scope", signUp])
+        .controller('NavBarCtrl', ["$scope", navBar]);
 
-    function home(){};
-    function login(){};
-    function signUp(){};
+    function home($scope){
+        var vm = this;
+    };
+
+    function login($scope){
+        var vm = this;
+    };
+
+    function signUp($scope){
+        var vm = this;
+    };
+
+    function navBar($scope){
+        var vm = this;
+        vm.logged = false;
+        vm.user = {name:"kk"}
+    };
+
 
 })();

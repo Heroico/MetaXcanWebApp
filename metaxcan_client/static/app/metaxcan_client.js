@@ -7,7 +7,8 @@
         $routeProvider.
             when('/home', {
                 templateUrl: 'static/app/partials/home.html',
-                controller: 'HomeCtrl'
+                controller: 'HomeCtrl',
+                controllerAs: 'vm'
               }).
             when('/login', {
                 templateUrl: 'static/app/partials/login.html',

@@ -1,4 +1,4 @@
-<nav class="navbar navbar-default" role="navigation">
+<nav class="navbar navbar-default" role="navigation" ng-controller="NavBarCtrl as vm">
   <div class="container-fluid">
     <div class="navbar-header">
       <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#mxc-nav">
@@ -7,20 +7,24 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <div class="navbar-brand">MetaXcan Client</div>
+      <a class="navbar-brand" href="{% url 'index' %}#/home">MetaXcan Client</a>
     </div> <!-- ./navbar-header -->
 
     <div class="collapse navbar-collapse" id="mxc-nav">
-      <ul class="nav navbar-nav pull-right">
-        {% if user.is_authenticated %}
-          <li><a href="/{{ user.username }}">{{ user.username }}</a></li>
-          <li><a href="/{{ user.username }}/settings">Settings</a></li>
-          <li><a href="javascript:void(0)">Logout</a></li>
-        {% else %}
+      <div ng-if="vm.logged != false">
+        <ul class="nav navbar-nav pull-right">
+          <li><a href="{% url 'index' %}#/user">
+            {% verbatim %}{{ vm.user.name }}{% endverbatim %}
+          </a></li>
+          <li><a href="{% url 'index' %}#/logout">Logout</a></li>
+        </ul>
+      </div>
+      <div ng-if="vm.logged == false">
+        <ul class="nav navbar-nav pull-right">
           <li><a href="{% url 'index' %}#/login">Login</a></li>
           <li><a href="{% url 'index' %}#/signup">Register</a></li>
-        {% endif %}
-      </ul>
+        </ul>
+      </div>
     </div> <!-- /.collapse.navbar-collapse -->
   </div> <!-- /.container-fluid -->
 </nav>

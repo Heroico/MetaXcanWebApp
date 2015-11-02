@@ -1,15 +1,14 @@
 <div class="row">
   <div class="col-md-4"></div>
   <div class="col-md-4">
-    <form class="form-signin">
-      <h2 class="form-signin-heading">Please sign in</h2>
+    <form class="form-signin" role="form" ng-submit="vm.login()">
+      <h2 class="form-signin-heading" class="sr-only">Please sign in</h2>
         <label for="exampleInputName">User Name</label>
-        <input ng-model="vm.user.name" type="text" class="form-control" id="exampleInputName" placeholder="Username" required>
-        <label for="inputEmail" class="sr-only">Email address</label>
-        <input ng-model="vm.user.email" type="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
+        <input ng-model="vm.user.name_or_email" type="text" class="form-control" id="exampleInputName" placeholder="User Name" required>
         <label for="inputPassword" class="sr-only">Password</label>
         <input ng-model="vm.user.password" type="password" id="inputPassword" class="form-control" placeholder="Password" required>
         <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+        {{vm.message}}
       </form>
     </div>
 </div>

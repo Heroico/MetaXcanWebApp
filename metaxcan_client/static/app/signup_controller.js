@@ -12,7 +12,15 @@
         vm.message = null;
 
         function signup(){
-            userService.signup(vm.user.name, vm.user.email, vm.user.password, function(){
+            vm.message = null;
+            //TODO: implement angular directive
+            var user = vm.user;
+            if (user.password.localeCompare(user.repeat_password)) {
+                vm.message = "Passwords dont match"
+                return;
+            }
+
+            userService.signup(user.name, user.email, user.password, function(){
                 vm.message = "OK";
                 $location.path("home");
             }, function(error){

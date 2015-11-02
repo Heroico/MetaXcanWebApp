@@ -20,13 +20,32 @@
                     email: email,
                     password: password
                 }
-            ).success(function(data){
+            ).then(function(response){
+                service.token = response.data.token
                 if (success)
                     success()
-                service.token = data.token
-            }).error(function(data){
+            }, function(response){
+                var message = null
+
+                if (response != undefined &&
+                    typeof response == "object" &&
+                    typeof response.data == "object" ){
+                    data = response.data
+                    if ("username" in data) {
+                        message = "User is invalid (or already taken)"
+                    } else if ("password" in data) {
+                        message = data.password
+                    } else if ("email" in data) {
+                        message = data.email
+                    } else {
+                        message = "Something went wrong. "+response.status
+                    }
+                } else {
+                    message = "Something went very wrong. "+response.status
+                }
+
                 if (error)
-                    error(data)
+                    error(message)
             })
         }
     };

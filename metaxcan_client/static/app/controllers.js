@@ -2,16 +2,11 @@
     'use strict';
 
     /* Controllers */
-    angular.module('metaxcanClientControllers', [])
+    angular.module('metaxcanClientControllers', ['metaxcanClientServices'])
         .controller('HomeCtrl', ["$scope", home])
-        .controller('SignUpCtrl', ["$scope", signUp])
         .controller('NavBarCtrl', ["$scope", navBar]);
 
     function home($scope){
-        var vm = this;
-    };
-
-    function signUp($scope){
         var vm = this;
     };
 

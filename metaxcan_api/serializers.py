@@ -13,18 +13,8 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         extra_kwargs = {'password': {'write_only': True}}
         read_only_fields = ('id',)
 
-    def create(self, validated_data):
-        user = User.objects.create(
-            username=validated_data['username'],
-            email=validated_data['email'],
-        )
 
-        user.set_password(validated_data['password'])
-        user.save()
-
-        return user
-
-class CreateUserSerializer(UserSerializer):
+class SessionUserSerializer(UserSerializer):
     token = serializers.SerializerMethodField()
 
     class Meta:
@@ -46,3 +36,16 @@ class CreateUserSerializer(UserSerializer):
         if not email: raise serializers.ValidationError("email required")
         if User.objects.filter(email=email).exclude(username=username).count(): raise serializers.ValidationError("email needs to be unique")
         return attrs
+
+    def create(self, validated_data):
+        user = User.objects.create(
+            username=validated_data['username'],
+            email=validated_data['email'],
+        )
+
+        user.set_password(validated_data['password'])
+        user.save()
+
+        Token.objects.create(user=user)
+
+        return user

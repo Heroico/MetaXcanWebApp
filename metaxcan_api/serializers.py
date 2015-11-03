@@ -38,3 +38,11 @@ class CreateUserSerializer(UserSerializer):
         user = User.objects.filter(email=validated_data.email)
         token = Token.objects.get(user=user)
         return token.key
+
+    def validate(self, attrs):
+        email = attrs['email']
+        username = attrs['username']
+
+        if not email: raise serializers.ValidationError("email required")
+        if User.objects.filter(email=email).exclude(username=username).count(): raise serializers.ValidationError("email needs to be unique")
+        return attrs

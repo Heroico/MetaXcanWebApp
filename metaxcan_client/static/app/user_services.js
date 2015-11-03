@@ -57,19 +57,25 @@
 
         function process_error(response, error_handler) {
             var message = null
-
+            //TODO: better error handling, this is too ad hoc and not internationalizable (yes, internationalization at this project, I know)
             if (response != undefined &&
                 typeof response == "object" &&
                 typeof response.data == "object" ){
                 data = response.data
                 if ("username" in data) {
-                    message = data.username//"User is invalid (or already taken)"
+                    message = "user name: "+data.username[0]//"User is invalid (or already taken)"
+                    if (message.indexOf("unique") != -1) {
+                        message = "User name already in use."
+                    }
                 } else if ("password" in data) {
-                    message = data.password
+                    message = "password: "+data.password[0]
                 } else if ("email" in data) {
-                    message = data.email
+                    message = "email:" + data.email[0]
                 } else if ("non_field_errors" in data) {
                     message = data.non_field_errors[0]
+                    if (message.indexOf("email") != -1) {
+                        message = "We couldn't accept your email. Please try a different one."
+                    }
                 } else {
                     message = "Something went wrong. "+response.status
                 }

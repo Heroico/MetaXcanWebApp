@@ -2,28 +2,21 @@
     'use strict';
 
     /* Controllers */
-    angular.module('metaxcanClientControllers', [])
-        .controller('HomeCtrl', ["$scope", home])
-        .controller('LoginCtrl', ["$scope", login])
-        .controller('SignUpCtrl', ["$scope", signUp])
-        .controller('NavBarCtrl', ["$scope", navBar]);
+    angular.module('metaxcanClientControllers', ['metaxcanClientServices'])
+        .controller('NavBarCtrl', ["$scope", "userService", navBar]);
 
-    function home($scope){
+    function navBar($scope, userService){
         var vm = this;
-    };
+        vm.loggedin = userService.loggedin();
+        vm.user = userService.user
 
-    function login($scope){
-        var vm = this;
-    };
+        vm.deregister_user_update = $scope.$on(userService.USER_UPDATED_NOTIFICATION, function(event,user) {
+            vm.user = user;
+        });
 
-    function signUp($scope){
-        var vm = this;
-    };
-
-    function navBar($scope){
-        var vm = this;
-        vm.logged = false;
-        vm.user = {name:"kk"}
+        vm.deregister_user_logged_in = $scope.$on(userService.USER_LOGGED_IN_NOTIFICATION, function(event) {
+            vm.loggedin = true
+        });
     };
 
 

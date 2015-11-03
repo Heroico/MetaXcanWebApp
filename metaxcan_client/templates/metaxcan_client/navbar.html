@@ -11,7 +11,7 @@
     </div> <!-- ./navbar-header -->
 
     <div class="collapse navbar-collapse" id="mxc-nav">
-      <div ng-if="vm.logged != false">
+      <div ng-if="vm.loggedin != false">
         <ul class="nav navbar-nav pull-right">
           <li><a href="{% url 'index' %}#/user">
             {% verbatim %}{{ vm.user.name }}{% endverbatim %}
@@ -19,7 +19,7 @@
           <li><a href="{% url 'index' %}#/logout">Logout</a></li>
         </ul>
       </div>
-      <div ng-if="vm.logged == false">
+      <div ng-if="vm.loggedin == false">
         <ul class="nav navbar-nav pull-right">
           <li><a href="{% url 'index' %}#/login">Login</a></li>
           <li><a href="{% url 'index' %}#/signup">Register</a></li>

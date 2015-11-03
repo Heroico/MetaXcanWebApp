@@ -3,17 +3,20 @@
 
     /* Controllers */
     angular.module('metaxcanClientControllers', ['metaxcanClientServices'])
-        .controller('HomeCtrl', ["$scope", home])
-        .controller('NavBarCtrl', ["$scope", navBar]);
+        .controller('NavBarCtrl', ["$scope", "userService", navBar]);
 
-    function home($scope){
+    function navBar($scope, userService){
         var vm = this;
-    };
+        vm.loggedin = userService.loggedin();
+        vm.user = userService.user
 
-    function navBar($scope){
-        var vm = this;
-        vm.logged = false;
-        vm.user = {name:"kk"}
+        vm.deregister_user_update = $scope.$on(userService.USER_UPDATED_NOTIFICATION, function(event,user) {
+            vm.user = user;
+        });
+
+        vm.deregister_user_logged_in = $scope.$on(userService.USER_LOGGED_IN_NOTIFICATION, function(event) {
+            vm.loggedin = true
+        });
     };
 
 

@@ -1,9 +1,12 @@
 (function(){
     angular.module('metaxcanClientServices')
-        .factory('userService', ['$http', userService])
+        .factory('userService', ['$rootScope', '$http', userService])
 
-    function userService($http){
+    function userService($rootScope, $http){
         var service = {}
+        service.user = {}
+        service.USER_LOGGED_IN_NOTIFICATION = 'user:loggedin'
+        service.USER_UPDATED_NOTIFICATION = 'user:updated'
         service.token = null
         service.signup = signup
         service.login = login
@@ -16,14 +19,14 @@
         }
 
         function signup(name, email, password, success_handler, error_handler) {
-            user_request("/api/users/create/", name, email, password, success_handler, error_handler)
+            session_request("/api/users/create/", name, email, password, success_handler, error_handler)
         }
 
         function login(name, email, password, success_handler, error_handler) {
-            user_request("/api/token/", name, email, password, success_handler, error_handler)
+            session_request("/api/token/", name, email, password, success_handler, error_handler)
         }
 
-        function user_request(url, name, email, password, success_handler, error_handler) {
+        function session_request(url, name, email, password, success_handler, error_handler) {
             var request = {password: password}
             if (name)
                 request.username = name
@@ -31,14 +34,23 @@
                 request.email = email
             var p = $http.post(url, request
             ).then(function(response){
+                service.token = response.data.token
+                $rootScope.$broadcast(service.USER_LOGGED_IN_NOTIFICATION);
+                update_user()
                 process_success(response, success_handler)
             }, function(response){
                 process_error(response, error_handler)
             })
         }
 
+        function update_user() {
+            /* TODO: implement backend user request, and notify
+            service.user.name = response.data.username
+            $rootScope.$broadcast(service.USER_UPDATED_NOTIFICATION, service.user);
+            */
+        }
+
         function process_success(response, success_handler) {
-            service.token = response.data.token
             if (success_handler)
                 success_handler();
         }

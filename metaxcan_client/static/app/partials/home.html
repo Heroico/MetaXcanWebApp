@@ -1,12 +1,12 @@
-<div ng-if="vm.logged == true">
+<div ng-if="vm.loggedin == true">
   <div class="row">
     <div class="col-md-4"></div>
     <div class="col-md-4 center-component">
-      <p class="lead">Welcome back!</p>
+      <p class="lead">Welcome, {{vm.user.name}}!</p>
     </div>
   </div>
 </div>
-<div ng-if="vm.logged != true">
+<div ng-if="vm.loggedin != true">
   <div class="row">
     <div class="col-md-4"></div>
     <div class="col-md-4 center-component">

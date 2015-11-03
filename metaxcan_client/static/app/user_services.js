@@ -23,7 +23,7 @@
         }
 
         function login(name, email, password, success_handler, error_handler) {
-            session_request("/api/token/", name, email, password, success_handler, error_handler)
+            session_request("/api/users/login/", name, email, password, success_handler, error_handler)
         }
 
         function session_request(url, name, email, password, success_handler, error_handler) {
@@ -36,18 +36,17 @@
             ).then(function(response){
                 service.token = response.data.token
                 $rootScope.$broadcast(service.USER_LOGGED_IN_NOTIFICATION);
-                update_user()
+                update_user(response)
                 process_success(response, success_handler)
             }, function(response){
                 process_error(response, error_handler)
             })
         }
 
-        function update_user() {
-            /* TODO: implement backend user request, and notify
+        function update_user(response) {
             service.user.name = response.data.username
+            service.user.email = response.data.email
             $rootScope.$broadcast(service.USER_UPDATED_NOTIFICATION, service.user);
-            */
         }
 
         function process_success(response, success_handler) {

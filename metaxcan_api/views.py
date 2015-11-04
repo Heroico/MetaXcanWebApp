@@ -1,6 +1,6 @@
 from django.http import Http404
 from rest_framework import permissions, parsers, renderers
-from rest_framework.exceptions import PermissionDenied
+from rest_framework.exceptions import PermissionDenied, NotAuthenticated
 from rest_framework.authtoken.models import Token
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -44,7 +44,7 @@ class LoginView(APIView):
 
 class JobViewSet(ModelViewSet):
     serializer_class = JobSerializer
-    permission_classes = (AuthenticatedOwnerPermission,)
+    permission_classes = (AuthenticatedOwnerPermission, )
 
     def get_queryset(self):
         user_id = self.kwargs['user_pk']
@@ -62,8 +62,12 @@ class JobViewSet(ModelViewSet):
             raise PermissionDenied
         serializer.save(owner=user)
 
-    @list_route(methods=['get'], permission_classes=(AuthenticatedOwnerPermission,))
+
+    @list_route(methods=['get'])
     def active(self, request, *args, **kwargs):
+        user = self.request.user
+        if not user.id:
+            raise NotAuthenticated
         active = Job.active_job(self.request.user)
         data = self.get_serializer(active).data if active else None
         return Response(data)

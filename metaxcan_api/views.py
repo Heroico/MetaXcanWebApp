@@ -1,3 +1,4 @@
+from django.http import Http404
 from rest_framework import permissions
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
 from rest_framework.viewsets import GenericViewSet
@@ -50,7 +51,13 @@ class JobViewSet(ModelViewSet):
     permission_classes = (AuthenticatedOwnerPermission,)
 
     def get_queryset(self):
-        return self.request.user.job_set.all()
+        user_id = self.kwargs['user_pk']
+        candidates = User.objects.filter(id=user_id).filter(id=self.request.user.id)
+        if candidates.count() == 1:
+            results = candidates[0].job_set.all()
+        else:
+            raise Http404
+        return results
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)

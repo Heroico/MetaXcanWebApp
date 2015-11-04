@@ -16,13 +16,14 @@ class GetUserTokenMixin(object):
 
 class CreateUserSerializer(serializers.HyperlinkedModelSerializer, GetUserTokenMixin):
     token = serializers.SerializerMethodField()
+
     email = serializers.EmailField(allow_blank=True, label='Email address', max_length=254, required=True)
 
     class Meta:
         model = User
         fields = ('id', 'username', 'password', 'email', 'token', )
         extra_kwargs = {'password': {'write_only': True}}
-        read_only_fields = ('id', 'username', 'token',)
+        read_only_fields = ('id', 'token',)
 
     def validate(self, attrs):
         email = attrs['email']

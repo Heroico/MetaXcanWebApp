@@ -1,5 +1,6 @@
 from rest_framework import permissions
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
+from rest_framework.viewsets import GenericViewSet
 from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView
 from django.contrib.auth.models import User  # If used custom user model
 from .serializers import CreateUserSerializer, SimpleUserSerializer
@@ -12,17 +13,13 @@ class CreateUserView(CreateAPIView):
     permission_classes = (permissions.AllowAny,)
     serializer_class = CreateUserSerializer
 
-class ListUsersView(ListAPIView):
-    serializer_class = SimpleUserSerializer
-    permission_classes = (AuthenticatedOwnerPermission,)
-
-    def get_queryset(self):
-        return [self.request.user]
-
-class RetrieveUserView(RetrieveAPIView):
+class SimpleUserViewSet( RetrieveModelMixin, ListModelMixin, GenericViewSet):
     serializer_class = SimpleUserSerializer
     permission_classes = (AuthenticatedUserPermission,)
-    queryset = User.objects.all()
+
+    def get_queryset(self):
+        result = User.objects.filter(id=self.request.user.id)
+        return result
 
 from rest_framework import parsers, renderers
 from rest_framework.authtoken.models import Token

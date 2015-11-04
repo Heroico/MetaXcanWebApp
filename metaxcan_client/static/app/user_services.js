@@ -19,11 +19,11 @@
         }
 
         function signup(name, email, password, success_handler, error_handler) {
-            session_request("/api/users/create/", name, email, password, success_handler, error_handler)
+            session_request("/api/signup/", name, email, password, success_handler, error_handler)
         }
 
         function login(name, email, password, success_handler, error_handler) {
-            session_request("/api/users/login/", name, email, password, success_handler, error_handler)
+            session_request("/api/login/", name, email, password, success_handler, error_handler)
         }
 
         function session_request(url, name, email, password, success_handler, error_handler) {

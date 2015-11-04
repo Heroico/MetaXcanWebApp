@@ -1,11 +1,17 @@
 from django.http import Http404
-from rest_framework import permissions
+from rest_framework import permissions, parsers, renderers
+from rest_framework.exceptions import PermissionDenied
+from rest_framework.authtoken.models import Token
+from rest_framework.views import APIView
+from rest_framework.response import Response
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
-from rest_framework.viewsets import GenericViewSet
-from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView
+from rest_framework.viewsets import GenericViewSet, ModelViewSet
+from rest_framework.generics import CreateAPIView
+from rest_framework.decorators import list_route
 from django.contrib.auth.models import User  # If used custom user model
-from .serializers import CreateUserSerializer, SimpleUserSerializer
+from .serializers import CreateUserSerializer, CreateSessionSerializer, SimpleUserSerializer, JobSerializer
 from .permissions import AuthenticatedOwnerPermission, AuthenticatedUserPermission
+from .models import Job
 
 #http://stackoverflow.com/questions/16857450/how-to-register-users-in-django-rest-framework
 
@@ -22,12 +28,6 @@ class SimpleUserViewSet( RetrieveModelMixin, ListModelMixin, GenericViewSet):
         result = User.objects.filter(id=self.request.user.id)
         return result
 
-from rest_framework import parsers, renderers
-from rest_framework.authtoken.models import Token
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from .serializers import CreateUserSerializer, CreateSessionSerializer
-
 class LoginView(APIView):
     throttle_classes = ()
     permission_classes = ()
@@ -42,10 +42,6 @@ class LoginView(APIView):
         token, created = Token.objects.get_or_create(user=user)
         return Response({'token': token.key, 'username':user.username, 'email':user.email, 'id':user.id})
 
-from rest_framework.viewsets import ModelViewSet
-from .permissions import AuthenticatedOwnerPermission
-from .serializers import JobSerializer
-
 class JobViewSet(ModelViewSet):
     serializer_class = JobSerializer
     permission_classes = (AuthenticatedOwnerPermission,)
@@ -56,8 +52,18 @@ class JobViewSet(ModelViewSet):
         if candidates.count() == 1:
             results = candidates[0].job_set.all()
         else:
-            raise Http404
+            raise PermissionDenied
         return results
 
     def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)
+        user = self.request.user
+        active_job = Job.active_job(user)
+        if active_job:
+            raise PermissionDenied
+        serializer.save(owner=user)
+
+    @list_route(methods=['get'], permission_classes=(AuthenticatedOwnerPermission,))
+    def active(self, request, *args, **kwargs):
+        active = Job.active_job(self.request.user)
+        data = self.get_serializer(active).data if active else None
+        return Response(data)

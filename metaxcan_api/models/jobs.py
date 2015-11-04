@@ -6,8 +6,11 @@ from django.contrib.auth.models import User
 
 class JobStateEnum(object):
     CREATED="created"
+    RUNNING="running"
+    COMPLETED="completed"
+    CANCELLED="cancelled"
 
-    options=[CREATED]
+    options=[CREATED, RUNNING, COMPLETED, CANCELLED]
 
 class Job(models.Model):
     owner = models.ForeignKey(User)
@@ -18,3 +21,11 @@ class Job(models.Model):
     def __str__(self):
         t = self.title if self.title else "Untitled Job"
         return t
+
+    @classmethod
+    def active_job(cls, owner):
+        results = Job.objects.filter(state="created", owner=owner)
+        if results.count() > 0:
+            return results[0]
+
+        return None

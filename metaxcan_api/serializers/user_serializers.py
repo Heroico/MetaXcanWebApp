@@ -22,7 +22,7 @@ class CreateUserSerializer(serializers.HyperlinkedModelSerializer, GetUserTokenM
         model = User
         fields = ('id', 'username', 'password', 'email', 'token', )
         extra_kwargs = {'password': {'write_only': True}}
-        read_only_fields = ('id', 'token',)
+        read_only_fields = ('id', 'username', 'token',)
 
     def validate(self, attrs):
         email = attrs['email']
@@ -44,3 +44,11 @@ class CreateUserSerializer(serializers.HyperlinkedModelSerializer, GetUserTokenM
         Token.objects.create(user=user)
 
         return user
+
+class SimpleUserSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id', 'username', )
+        read_only_fields = ('id',)
+
+

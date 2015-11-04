@@ -46,6 +46,7 @@
         function update_user(response) {
             service.user.name = response.data.username
             service.user.email = response.data.email
+            service.user.id = response.data.id
             $rootScope.$broadcast(service.USER_UPDATED_NOTIFICATION, service.user);
         }
 

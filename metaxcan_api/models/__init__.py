@@ -1,3 +1,3 @@
 __author__ = 'heroico'
 
-from . import  jobs
+from .jobs import Job

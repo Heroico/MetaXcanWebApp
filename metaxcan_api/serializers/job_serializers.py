@@ -10,5 +10,4 @@ class JobSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Job
         fields = ('id', 'title', 'state', 'owner', 'created_date', )
-        read_only_fields = ('id', 'owner', 'created_date')
-
+        read_only_fields = ('id', 'owner', 'created_date', 'state', )

@@ -50,4 +50,7 @@ class JobViewSet(ModelViewSet):
     permission_classes = (AuthenticatedOwnerPermission,)
 
     def get_queryset(self):
-        return self.request.user.jobs.all()
+        return self.request.user.job_set.all()
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)

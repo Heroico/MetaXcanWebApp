@@ -3,9 +3,9 @@
 
     /* Controllers */
     angular.module('metaxcanClientControllers')
-        .controller('LoginCtrl', ["$scope", "$location", "userService", login]);
+        .controller('LoginCtrl', ["$scope", "$location", "userService", "home_path", login]);
 
-    function login($scope, $location, userService){
+    function login($scope, $location, userService, home_path){
         var vm = this;
         vm.user = {name_or_email:null, password:null}
         vm.message = null;
@@ -26,7 +26,7 @@
 
             userService.login(name, email, vm.user.password, function(){
                 vm.message = "OK";
-                $location.path("home");
+                $location.path(home_path);
             }, function(error){
                 vm.message = error;
             })

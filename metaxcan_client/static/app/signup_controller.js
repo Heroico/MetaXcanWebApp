@@ -3,9 +3,9 @@
 
     /* Controllers */
     angular.module('metaxcanClientControllers')
-        .controller('SignUpCtrl', ["$scope", "$location", "userService", signUp]);
+        .controller('SignUpCtrl', ["$scope", "$location", "userService", "home_path", signUp]);
 
-    function signUp($scope, $location, userService){
+    function signUp($scope, $location, userService, home_path){
         var vm = this;
         vm.user = {name:null, password:null, repeat_password:null, email:null };
         vm.signup = signup;
@@ -22,7 +22,7 @@
 
             userService.signup(user.name, user.email, user.password, function(){
                 vm.message = "OK";
-                $location.path("home");
+                $location.path(home_path);
             }, function(error){
                 vm.message = error;
             })

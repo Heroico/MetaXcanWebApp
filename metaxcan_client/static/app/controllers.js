@@ -2,7 +2,7 @@
     'use strict';
 
     /* Controllers */
-    angular.module('metaxcanClientControllers', ['metaxcanClientServices'])
+    angular.module('metaxcanClientControllers', ['metaxcanClientServices', 'angularSpinner'])
         .controller('NavBarCtrl', ["$scope", "userService", navBar]);
 
     function navBar($scope, userService){

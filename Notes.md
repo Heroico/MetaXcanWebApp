@@ -1,3 +1,14 @@
+SETUP
+-----
+
+At the very least.
+```
+$ pip install stuff
+$ cd metaxcan_client
+$ npm install
+```
+
+
 Node And JS Garbage
 -------------------
 

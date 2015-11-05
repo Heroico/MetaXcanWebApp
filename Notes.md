@@ -8,6 +8,11 @@ $ cd metaxcan_client
 $ npm install
 ```
 
+I installed nested routers from repo master:
+
+```bash
+$ pip install -e git+git://github.com/alanjds/drf-nested-routers@master#egg=drf-nested-routers-master
+```
 
 Node And JS Garbage
 -------------------

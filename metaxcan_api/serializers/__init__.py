@@ -3,3 +3,5 @@ __author__ = 'heroico'
 from .user_serializers import CreateUserSerializer, SimpleUserSerializer
 from .session_serializers import CreateSessionSerializer
 from .job_serializers import JobSerializer
+from .transcriptome_model_database_serializers import TranscriptomeModelSerializer
+from .metaxcan_parameters_serializers import MetaxcanParametersSerializer

@@ -20,7 +20,8 @@ class Job(models.Model):
 
     def __str__(self):
         t = self.title if self.title else "Untitled Job"
-        return t
+        c = str(self.created_date)
+        return "-".join([t, c])
 
     @classmethod
     def active_job(cls, owner):

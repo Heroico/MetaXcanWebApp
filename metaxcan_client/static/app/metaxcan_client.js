@@ -1,7 +1,13 @@
 (function(){
     angular
-        .module('metaxcan_client', ['metaxcanClientControllers', 'ngRoute'])
-        .config(['$routeProvider',configRouteProvider]);
+        .module('metaxcan_client', ['metaxcanClientControllers', 'ngRoute', 'ngResource'])
+        .config(['$routeProvider',configRouteProvider])
+        .config(['$resourceProvider', configResourceProvider]);
+
+    function configResourceProvider($resourceProvider){
+        // Don't strip trailing slashes from calculated URLs
+        $resourceProvider.defaults.stripTrailingSlashes = false;
+    }
 
     function configRouteProvider($routeProvider) {
         $routeProvider.

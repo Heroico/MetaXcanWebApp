@@ -3,6 +3,8 @@
     <div class="col-md-4"></div>
     <div class="col-md-4 center-component">
       <p class="lead">Welcome, {{vm.user.name}}!</p>
+      <p>{{ vm.activeJob ? "You have one active job" : "You have no jobs" }}</p>
+      <p>{{ vm.error ? vm.error : "" }}</p>
     </div>
   </div>
 </div>

@@ -10,6 +10,7 @@
     "angular-route": "1.4.x",
     "angular-loader": "1.4.x",
     "angular-mocks": "1.4.x",
+    "angular-resource": "1.4.x",
     "html5-boilerplate": "~5.2.0",
     "bootstrap": "~3.3.0",
     "bootstrap-material-design": "~0.1.5",

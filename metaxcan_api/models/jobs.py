@@ -3,6 +3,7 @@ __author__ = 'heroico'
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
+from .metaxcan_parameters import MetaxcanParameters
 
 class JobStateEnum(object):
     CREATED="created"
@@ -17,6 +18,8 @@ class Job(models.Model):
     title = models.CharField(max_length=200)
     state = models.CharField(max_length=10, default=JobStateEnum.CREATED)
     created_date = models.DateTimeField('date created', default=timezone.now)
+
+    metaxcan_parameters = models.OneToOneField(MetaxcanParameters, blank=True, null=True, default=None)
 
     def __str__(self):
         t = self.title if self.title else "Untitled Job"

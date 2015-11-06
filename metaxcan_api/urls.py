@@ -15,7 +15,7 @@ read_only_router.register("users", SimpleUserViewSet, "user")
 read_only_router.register("transcriptomes", TranscriptomeModelViewSet, "transcriptome")
 
 user_router = NestedSimpleRouter(read_only_router, r'users', lookup='user')
-user_router.register(r'jobs', JobViewSet, base_name="user-jobs")
+user_router.register(r'jobs', JobViewSet, base_name="jobs")
 
 jobs_router = NestedSimpleRouter(user_router, r'jobs', lookup='job')
 jobs_router.register(r'metaxcan_parameters', MetaxcanParametersViewSet, base_name='metaxcan_parameters')

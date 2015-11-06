@@ -4,7 +4,6 @@ from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
-from rest_framework_nested import relations
 
 #http://stackoverflow.com/questions/16857450/how-to-register-users-in-django-rest-framework
 

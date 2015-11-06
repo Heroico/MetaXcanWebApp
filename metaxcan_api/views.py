@@ -69,8 +69,10 @@ class JobViewSet(ReadOnlyModelViewSet):
             raise PermissionDenied
 
         job, headers = self.create_job(request, args, kwargs)
-        metaxcan_parameters = MetaxcanParameters(job=job, owner=user)
+        metaxcan_parameters = MetaxcanParameters(owner=user)
         metaxcan_parameters.save()
+        job.metaxcan_parameters = metaxcan_parameters
+        job.save()
         serializer = self.get_serializer(job)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 

@@ -7,11 +7,12 @@
     <div class="col-md-4"></div>
     <div class="col-md-4 center-component">
       <p class="lead">Welcome, {{vm.user.name}}!</p>
-      <div ng-if="vm.activeJob">
-        You have one job, redirecting...
+      <div ng-if="vm.activeJob == null">
+        <button class="btn btn-primary btn-block" ng-click="vm.createMetaxcan()">
+          New Metaxcan Process
+        </button>
       </div>
-
-      <p>{{ vm.error ? vm.error : "" }}</p>
+      <p>{{ vm.message ? vm.message : "" }}</p>
     </div>
   </div>
 </div>

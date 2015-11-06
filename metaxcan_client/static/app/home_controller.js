@@ -9,6 +9,7 @@
 
     function home($scope, $location, $timeout, userService, jobService, usSpinnerService, paths) {
         var vm = this;
+        vm.createMetaxcan = createMetaxcan
         vm.loggedin = userService.loggedin();
         vm.user = userService.user;
         vm.activeJob = null;
@@ -53,12 +54,17 @@
         function activeJobUpdated(activeJob) {
             vm.activeJob = activeJob;
             if (activeJob) {
+                vm.message = "Found active job, redirecting";
                 $location.path(paths.metaxcan_job_path);
             }
         }
 
         function activeJobError(error) {
-            vm.error = error.message;
+            vm.message = error.message;
+        }
+
+        function createMetaxcan() {
+            alert("howdy");
         }
 
     };

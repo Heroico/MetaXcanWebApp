@@ -1,11 +1,16 @@
 (function(){
     var HOME_PATH = 'home';
     var METAXCAN_JOB_PATH = 'metaxcan_job';
+    var LOGIN_PATH = 'login';
+    var SIGN_UP_PATH = "signup";
 
     angular
         .module('metaxcan_client', ['metaxcanClientControllers', 'ngRoute', 'ngResource'])
-        .constant('home_path', HOME_PATH)
-        .constant('metaxcan_job_path', METAXCAN_JOB_PATH)
+        .constant('paths',
+            {home:HOME_PATH,
+             metaxcan_job_path:METAXCAN_JOB_PATH,
+             login_path:LOGIN_PATH,
+             signup_path:SIGN_UP_PATH})
         .config(['$routeProvider',configRouteProvider])
         .config(['$resourceProvider', configResourceProvider]);
 
@@ -21,12 +26,12 @@
                 controller: 'HomeCtrl',
                 controllerAs: 'vm'
               }).
-            when('/login', {
+            when('/'+LOGIN_PATH, {
                 templateUrl: 'static/app/partials/login.html',
                 controller: 'LoginCtrl',
                 controllerAs: 'vm',
             }).
-            when('/signup', {
+            when('/'+SIGN_UP_PATH, {
                 templateUrl: 'static/app/partials/signup.html',
                 controller: 'SignUpCtrl',
                 controllerAs: 'vm',

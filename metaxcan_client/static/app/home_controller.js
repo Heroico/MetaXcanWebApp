@@ -4,10 +4,10 @@
     angular.module('metaxcanClientControllers')
         .controller('HomeCtrl',
             ["$scope", "$location", "$timeout", "userService", "jobService", "usSpinnerService",
-            "metaxcan_job_path",
+            "paths",
             home]);
 
-    function home($scope, $location, $timeout, userService, jobService, usSpinnerService, metaxcan_job_path) {
+    function home($scope, $location, $timeout, userService, jobService, usSpinnerService, paths) {
         var vm = this;
         vm.loggedin = userService.loggedin();
         vm.user = userService.user;
@@ -53,7 +53,7 @@
         function activeJobUpdated(activeJob) {
             vm.activeJob = activeJob;
             if (activeJob) {
-                $location.path(metaxcan_job_path);
+                $location.path(paths.metaxcan_job_path);
             }
         }
 

@@ -3,13 +3,14 @@
 
     angular.module('metaxcanClientControllers')
         .controller('HomeCtrl',
-            ["$scope", "$location", "$timeout", "userService", "jobService", "usSpinnerService",
+            ["$scope", "$location", "$timeout", "ngDialog",
+            "userService", "jobService", "usSpinnerService",
             "paths",
             home]);
 
-    function home($scope, $location, $timeout, userService, jobService, usSpinnerService, paths) {
+    function home($scope, $location, $timeout, ngDialog, userService, jobService, usSpinnerService, paths) {
         var vm = this;
-        vm.createMetaxcan = createMetaxcan
+        vm.onCreateMetaxcan = onCreateMetaxcan;
         vm.loggedin = userService.loggedin();
         vm.user = userService.user;
         vm.activeJob = null;
@@ -63,8 +64,41 @@
             vm.message = error.message;
         }
 
-        function createMetaxcan() {
-            alert("howdy");
+        function onCreateMetaxcan() {
+            var dialog = ngDialog.open({
+                template: 'static/app/dialogs/new_metaxcan_dialog.html',
+                controller: ['$scope', function($scope) {
+                    //sigh, old style, "controllerAs" is not working
+                    $scope.parameters = {
+                        title: null
+                    };
+
+                    $scope.done = done;
+
+                    function done() {
+                        $scope.closeThisDialog($scope.parameters);
+                    }
+                }]
+            });
+
+            dialog.closePromise.then(doCreateMetaxcan);
+        }
+
+        function doCreateMetaxcan(result) {
+
+            console.log("result "+JSON.stringify(result))
+            if (!result || !result.value) {
+                return;
+            }
+
+            var value = result.value
+            if (typeof value === "string" ) {
+                return;
+            }
+
+            if ( value ){
+                alert(value);
+            }
         }
 
     };

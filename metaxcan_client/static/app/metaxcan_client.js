@@ -5,7 +5,7 @@
     var SIGN_UP_PATH = "signup";
 
     angular
-        .module('metaxcan_client', ['metaxcanClientControllers', 'ngRoute', 'ngResource'])
+        .module('metaxcan_client', ['metaxcanClientControllers', 'ngRoute', 'ngResource', 'ngDialog'])
         .constant('paths',
             {home:HOME_PATH,
              metaxcan_job_path:METAXCAN_JOB_PATH,

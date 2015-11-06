@@ -8,7 +8,7 @@ class MetaxcanParametersSerializer(serializers.HyperlinkedModelSerializer):
     # TODO: implement user view
     owner = serializers.HyperlinkedRelatedField(view_name='user-detail', read_only=True)
     job = serializers.PrimaryKeyRelatedField(read_only=True)
-    transcriptome = serializers.PrimaryKeyRelatedField(queryset=TranscriptomeModelDB.objects.all())
+    transcriptome = serializers.PrimaryKeyRelatedField(queryset=TranscriptomeModelDB.objects.all(), required=False)
 
     class Meta:
         model = MetaxcanParameters

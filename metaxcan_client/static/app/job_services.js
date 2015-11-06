@@ -7,6 +7,7 @@
         service.updateToken = updateToken;
         service.updateUser = updateUser;
         service.getActiveJob = getActiveJob;
+        service.createJob = createJob
         service.JOB_SERVICE_READY_NOTIFICATION = "jobs:ready";
         service.JOB_SERVICE_DOWN_NOTIFICATION = "jobs:down";
         service.ready = false;
@@ -68,7 +69,7 @@
                 active:{
                     method:"GET",
                     isArray:false,
-                    interceptor:{response:getActiveJobSuccess, responseError:getActiveJobError},
+                    interceptor:{response:jobSuccessCallback, responseError:jobErrorCallback},
                     headers:{'Authorization':(' Token '+service.token), 'kk':'kk'}
                 },
             });
@@ -79,7 +80,23 @@
             return p;
         }
 
-        function getActiveJobSuccess(response) {
+        function createJob(parameters) {
+            var resource = $resource("api/users/:user_id/jobs/create_metaxcan/", {}, {
+                create_metaxcan:{
+                    method:"POST",
+                    isArray:false,
+                    interceptor:{response:jobSuccessCallback, responseError:jobErrorCallback},
+                    headers:{'Authorization':(' Token '+service.token), 'kk':'kk'}
+                },
+            });
+
+            var p = resource
+                        .create_metaxcan({user_id: service.user.id}, parameters)
+                        .$promise
+            return p;
+        }
+
+        function jobSuccessCallback(response) {
             //console.log("Active job success "+JSON.stringify(response))
             job = response.data;
             if (job && "id" in job) {
@@ -89,7 +106,7 @@
             return service.activeJob;
         }
 
-        function getActiveJobError(response) {
+        function jobErrorCallback(response) {
             //console.log("Active job error "+JSON.stringify(response))
             message = "Something went wrong with the Job";
             if (response != undefined &&

@@ -96,9 +96,8 @@
                 return;
             }
 
-            if ( value ){
-                alert(value);
-            }
+            usSpinnerService.spin('my_spinner');
+            jobService.createJob(value).then(activeJobCallback)
         }
 
     };

@@ -17,14 +17,10 @@ read_only_router.register("transcriptomes", TranscriptomeModelViewSet, "transcri
 user_router = NestedSimpleRouter(read_only_router, r'users', lookup='user')
 user_router.register(r'jobs', JobViewSet, base_name="jobs")
 
-jobs_router = NestedSimpleRouter(user_router, r'jobs', lookup='job')
-jobs_router.register(r'metaxcan_parameters', MetaxcanParametersViewSet, base_name='metaxcan_parameters')
-
 urlpatterns = [
     url(r'^', include(router.urls)),
     url(r'^', include(read_only_router.urls)),
     url(r'^', include(user_router.urls)),
-    url(r'^', include(jobs_router.urls)),
     url(r'^signup/$', CreateUserView.as_view()),
     url(r'^login/$', LoginView.as_view()),
 ]

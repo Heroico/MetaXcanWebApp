@@ -3,10 +3,10 @@ __author__ = 'heroico'
 import copy
 from rest_framework import status
 from rest_framework.settings import api_settings
-from rest_framework.exceptions import PermissionDenied, NotAuthenticated
+from rest_framework.exceptions import PermissionDenied, NotAuthenticated, NotFound, ParseError
 from rest_framework.response import Response
 from rest_framework.viewsets import ReadOnlyModelViewSet
-from rest_framework.decorators import list_route
+from rest_framework.decorators import list_route, detail_route
 from django.contrib.auth.models import User
 from metaxcan_api.serializers import JobSerializer, MetaxcanParametersSerializer
 from metaxcan_api.permissions import AuthenticatedOwnerPermission
@@ -74,3 +74,41 @@ class JobViewSet(ReadOnlyModelViewSet):
         kwargs['context'] = self.get_serializer_context()
         metaxcan_parameters_serializer = MetaxcanParametersSerializer(*args, **kwargs)
         return metaxcan_parameters_serializer
+
+    @detail_route(methods=['get', 'patch'])
+    def metaxcan_parameters(self, request, user_pk, pk=None, *args, **kwargs):
+        user = self.get_authenticated_user()
+        jobs = Job.objects.filter(id=pk)
+        job = jobs[0] if jobs.count() == 1 else None
+        if not job:
+            raise NotFound
+        if job.owner != user:
+            raise PermissionDenied
+
+        metaxcan_parameters = job.metaxcan_parameters
+        if not metaxcan_parameters:
+            raise NotFound
+
+        if request.method == 'GET':
+            return self.response_metaxcan_data(metaxcan_parameters=metaxcan_parameters)
+
+        if request.method == 'PATCH':
+            return self.partial_update_metaxcan_data(request, metaxcan_parameters)
+
+    def response_metaxcan_data(self, metaxcan_parameters=None, serializer=None):
+        if not (metaxcan_parameters or serializer):
+            raise ParseError
+        serializer = self.get_metaxcan_parameters_serializer(metaxcan_parameters) if not serializer else serializer
+        return Response(serializer.data)
+
+    def update_metaxcan_data(self, request, metaxcan_parameters, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        serializer = self.get_metaxcan_parameters_serializer(metaxcan_parameters, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return self.response_metaxcan_data(serializer=serializer)
+
+    def partial_update_metaxcan_data(self, request, *args, **kwargs):
+        kwargs['partial'] = True
+        return self.update_metaxcan_data(request, *args, **kwargs)
+

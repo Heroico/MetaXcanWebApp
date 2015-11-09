@@ -8,7 +8,7 @@ from metaxcan_api.serializers import MetaxcanParametersSerializer
 from metaxcan_api.permissions import AuthenticatedOwnerPermission
 from metaxcan_api.models import MetaxcanParameters
 
-
+# not used anymore, saved for reference because the API is in flux
 class MetaxcanParametersViewSet(RetrieveModelMixin, UpdateModelMixin, GenericViewSet):
     serializer_class = MetaxcanParametersSerializer
     permission_classes = (AuthenticatedOwnerPermission,)

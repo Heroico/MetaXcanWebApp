@@ -1,4 +1,64 @@
-<div class="row">
-  <div class="col-md-4"></div>
-  <div class="col-md-4 center-component">Yo!</div>
-</div>
+<form class="form" role="form" ng-submit="vm.start()">
+  <div class="row">
+    <div class="col-md-3"></div>
+    <div class="col-md-6 center-component">
+      <h2 class="form-heading">Metaxcan Job:{{(vm.job.title && vm.job.title.length) ? vm.job.title : "Untitled job"}}</h2>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-3"></div>
+    <div class="col-md-2">
+      <div class="form-control-wrapper">
+        <input ng-model="vm.parameters.snp_column" type="text" class="form-control" id="snpColumn" required>
+        <div class="floating-label">SNP Column Name</div>
+        <span class="material-input"></span>
+      </div>
+      <div class="form-control-wrapper">
+        <input ng-model="vm.parameters.other_allele_column" type="text" class="form-control" id="otherAlleleColumn" required>
+        <div class="floating-label">Other (reference) Allele Column Name</div>
+        <span class="material-input"></span>
+      </div>
+      <div class="form-control-wrapper">
+        <input ng-model="vm.parameters.effect_allele_column" type="text" class="form-control" id="effectAlleleColumn" required>
+        <div class="floating-label">Effect Allele Column Name</div>
+        <span class="material-input"></span>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="form-control-wrapper">
+        <input ng-model="vm.parameters.odd_ratio_column" type="text" class="form-control" id="oddRatioColumn">
+        <div class="floating-label">Odd Ratio Column Name</div>
+        <span class="material-input"></span>
+      </div>
+      <div class="form-control-wrapper">
+        <input ng-model="vm.parameters.beta_column" type="text" class="form-control" id="betaColumn">
+        <div class="floating-label">Beta Column Name</div>
+        <span class="material-input"></span>
+      </div>
+      <div class="form-control-wrapper">
+        <input ng-model="vm.parameters.beta_sign_column" type="text" class="form-control" id="betaSignColumn">
+        <div class="floating-label">Beta Sign Column Name</div>
+        <span class="material-input"></span>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="form-control-wrapper">
+        <input ng-model="vm.parameters.p_column" type="text" class="form-control" id="pColumn">
+        <div class="floating-label">P-Value Column Name</div>
+        <span class="material-input"></span>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-4"></div>
+    <div class="col-md-4 center-component">
+      <button class="btn btn-lg btn-primary btn-block" type="submit">Start</button>
+    </div>
+  </div>
+{{vm.message}}
+  <style>
+    .form-control-wrapper {
+      margin: 18px 0;
+    }
+  </style>
+</form>

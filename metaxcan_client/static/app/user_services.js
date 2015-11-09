@@ -35,7 +35,7 @@
             var p = $http.post(url, request
             ).then(function(response){
                 service.token = response.data.token
-                $rootScope.$broadcast(service.USER_LOGGED_IN_NOTIFICATION);
+                $rootScope.$broadcast(service.USER_LOGGED_IN_NOTIFICATION, service.token);
                 update_user(response)
                 process_success(response, success_handler)
             }, function(response){

@@ -1,10 +1,13 @@
-from rest_framework import permissions
+from rest_framework import permissions, parsers, renderers
+from rest_framework.authtoken.models import Token
+from rest_framework.views import APIView
+from rest_framework.response import Response
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
 from rest_framework.viewsets import GenericViewSet
-from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView
+from rest_framework.generics import CreateAPIView
 from django.contrib.auth.models import User  # If used custom user model
-from .serializers import CreateUserSerializer, SimpleUserSerializer
-from .permissions import AuthenticatedOwnerPermission, AuthenticatedUserPermission
+from metaxcan_api.serializers import CreateUserSerializer, CreateSessionSerializer, SimpleUserSerializer
+from metaxcan_api.permissions import AuthenticatedUserPermission
 
 #http://stackoverflow.com/questions/16857450/how-to-register-users-in-django-rest-framework
 
@@ -21,12 +24,6 @@ class SimpleUserViewSet( RetrieveModelMixin, ListModelMixin, GenericViewSet):
         result = User.objects.filter(id=self.request.user.id)
         return result
 
-from rest_framework import parsers, renderers
-from rest_framework.authtoken.models import Token
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from .serializers import CreateUserSerializer, CreateSessionSerializer
-
 class LoginView(APIView):
     throttle_classes = ()
     permission_classes = ()
@@ -41,16 +38,4 @@ class LoginView(APIView):
         token, created = Token.objects.get_or_create(user=user)
         return Response({'token': token.key, 'username':user.username, 'email':user.email, 'id':user.id})
 
-from rest_framework.viewsets import ModelViewSet
-from .permissions import AuthenticatedOwnerPermission
-from .serializers import JobSerializer
 
-class JobViewSet(ModelViewSet):
-    serializer_class = JobSerializer
-    permission_classes = (AuthenticatedOwnerPermission,)
-
-    def get_queryset(self):
-        return self.request.user.job_set.all()
-
-    def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)

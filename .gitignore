@@ -3,6 +3,7 @@
 .idea
 req.txt
 kk*
+src
 
 # Node modules
 node_modules/

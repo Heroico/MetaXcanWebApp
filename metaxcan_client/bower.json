@@ -10,11 +10,13 @@
     "angular-route": "1.4.x",
     "angular-loader": "1.4.x",
     "angular-mocks": "1.4.x",
+    "angular-resource": "1.4.x",
+    "angular-spinner": "0.8.x",
+    "ng-dialog": "0.5.x",
     "html5-boilerplate": "~5.2.0",
     "bootstrap": "~3.3.0",
     "bootstrap-material-design": "~0.1.5",
     "jquery": "~2.1.1",
-    "ngDialog": "~0.3.3",
     "underscore": "~1.7.0"
   }
 }

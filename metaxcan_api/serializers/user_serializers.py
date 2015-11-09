@@ -47,9 +47,10 @@ class CreateUserSerializer(serializers.HyperlinkedModelSerializer, GetUserTokenM
         return user
 
 class SimpleUserSerializer(serializers.HyperlinkedModelSerializer):
+
     class Meta:
         model = User
         fields = ('id', 'username', )
-        read_only_fields = ('id',)
+        read_only_fields = ('id', )
 
 

@@ -3,16 +3,19 @@ from rest_framework.authtoken import views
 from rest_framework_nested.routers import NestedSimpleRouter
 from rest_framework.routers import DefaultRouter
 from .routers import ReadOnlyRouter
-from metaxcan_api.views import CreateUserView, LoginView, JobViewSet, SimpleUserViewSet
+from metaxcan_api.views import CreateUserView, LoginView, JobViewSet, \
+    SimpleUserViewSet, TranscriptomeModelViewSet, MetaxcanParametersViewSet
+
 
 # Create a router and register our viewsets with it.
 router = DefaultRouter()
 
 read_only_router = ReadOnlyRouter()
 read_only_router.register("users", SimpleUserViewSet, "user")
+read_only_router.register("transcriptomes", TranscriptomeModelViewSet, "transcriptome")
 
 user_router = NestedSimpleRouter(read_only_router, r'users', lookup='user')
-user_router.register(r'jobs', JobViewSet, base_name="user-jobs")
+user_router.register(r'jobs', JobViewSet, base_name="jobs")
 
 urlpatterns = [
     url(r'^', include(router.urls)),

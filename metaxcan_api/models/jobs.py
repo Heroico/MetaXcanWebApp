@@ -3,11 +3,15 @@ __author__ = 'heroico'
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
+from .metaxcan_parameters import MetaxcanParameters
 
 class JobStateEnum(object):
     CREATED="created"
+    RUNNING="running"
+    COMPLETED="completed"
+    CANCELLED="cancelled"
 
-    options=[CREATED]
+    options=[CREATED, RUNNING, COMPLETED, CANCELLED]
 
 class Job(models.Model):
     owner = models.ForeignKey(User)
@@ -15,6 +19,17 @@ class Job(models.Model):
     state = models.CharField(max_length=10, default=JobStateEnum.CREATED)
     created_date = models.DateTimeField('date created', default=timezone.now)
 
+    metaxcan_parameters = models.OneToOneField(MetaxcanParameters, blank=True, null=True, default=None)
+
     def __str__(self):
         t = self.title if self.title else "Untitled Job"
-        return t
+        c = str(self.created_date)
+        return "-".join([t, c])
+
+    @classmethod
+    def active_job(cls, owner):
+        results = Job.objects.filter(state="created", owner=owner)
+        if results.count() > 0:
+            return results[0]
+
+        return None

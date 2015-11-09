@@ -1,8 +1,18 @@
 <div ng-if="vm.loggedin == true">
   <div class="row">
     <div class="col-md-4"></div>
+    <div class="col-md-4 center-component"><span us-spinner="{radius:10, width:4, length: 8}" spinner-key="my_spinner"></span></div>
+  </div>
+  <div class="row">
+    <div class="col-md-4"></div>
     <div class="col-md-4 center-component">
       <p class="lead">Welcome, {{vm.user.name}}!</p>
+      <div ng-if="vm.activeJob == null">
+        <button class="btn btn-primary btn-block" ng-click="vm.onCreateMetaxcan()">
+          New Metaxcan Process
+        </button>
+      </div>
+      <p>{{ vm.message ? vm.message : "" }}</p>
     </div>
   </div>
 </div>

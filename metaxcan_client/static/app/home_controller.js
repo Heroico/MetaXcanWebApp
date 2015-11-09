@@ -46,7 +46,7 @@
             }, 100);
 
             if (result && "message" in result) {
-                activeJobError(result);
+                errorHandler(result);
             } else {
                 activeJobUpdated(result);
             }
@@ -55,15 +55,29 @@
         function activeJobUpdated(activeJob) {
             vm.activeJob = activeJob;
             if (activeJob) {
-                vm.message = "Found active job, redirecting";
-                $location.path(paths.metaxcan_job_path);
+                vm.message = "Found active job, refreshing";
+                jobService.getMetaxcanParameters(jobService.activeJob).then(metaxcanParametersCallback);
             }
         }
 
-        function activeJobError(error) {
+        function errorHandler(error) {
             vm.message = error.message;
         }
 
+        function metaxcanParametersCallback(result) {
+            if (result && "message" in result) {
+                errorHandler(result);
+            } else {
+                metaxcanParametersUpdated(result);
+            }
+        }
+
+        function metaxcanParametersUpdated(parameters) {
+             vm.message = "Refreshed parameters, redirecting";
+             $location.path(paths.metaxcan_job_path);
+        }
+
+/* */
         function onCreateMetaxcan() {
             var dialog = ngDialog.open({
                 template: 'static/app/dialogs/new_metaxcan_dialog.html',
@@ -97,7 +111,7 @@
             }
 
             usSpinnerService.spin('my_spinner');
-            jobService.createJob(value).then(activeJobCallback)
+            jobService.createMetaxcanJob(value).then(activeJobCallback)
         }
 
     };

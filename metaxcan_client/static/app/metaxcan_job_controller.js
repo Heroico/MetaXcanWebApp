@@ -8,8 +8,7 @@
     function metaxcanJobController($scope, jobService){
         var vm = this;
         vm.job = jobService.activeJob;
-        vm.parameters =  {};
-        vm.parameters.snp_column = "SNP";
+        vm.parameters =  jobService.metaxcanParameters;
 
         vm.start = start
 

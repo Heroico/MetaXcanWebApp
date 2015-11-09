@@ -7,11 +7,13 @@
         service.updateToken = updateToken;
         service.updateUser = updateUser;
         service.getActiveJob = getActiveJob;
-        service.createJob = createJob
+        service.createMetaxcanJob = createMetaxcanJob;
+        service.getMetaxcanParameters = getMetaxcanParameters;
         service.JOB_SERVICE_READY_NOTIFICATION = "jobs:ready";
         service.JOB_SERVICE_DOWN_NOTIFICATION = "jobs:down";
         service.ready = false;
         service.activeJob = null;
+        service.metaxcanParameters = null;
         service.user =null;
         service.error = null;
 
@@ -80,7 +82,7 @@
             return p;
         }
 
-        function createJob(parameters) {
+        function createMetaxcanJob(parameters) {
             var resource = $resource("api/users/:user_id/jobs/create_metaxcan/", {}, {
                 create_metaxcan:{
                     method:"POST",
@@ -97,7 +99,6 @@
         }
 
         function jobSuccessCallback(response) {
-            //console.log("Active job success "+JSON.stringify(response))
             job = response.data;
             if (job && "id" in job) {
                 service.activeJob = job;
@@ -107,8 +108,11 @@
         }
 
         function jobErrorCallback(response) {
-            //console.log("Active job error "+JSON.stringify(response))
             message = "Something went wrong with the Job";
+            return handleError(message, response);
+        }
+
+        function handleError(message, response) {
             if (response != undefined &&
                 typeof response == "object" &&
                 typeof response.data == "object" ) {
@@ -120,6 +124,39 @@
             service.error = {message:message};
             service.activeJob = null;
             return service.error;
+        }
+
+        function getMetaxcanParameters(job) {
+            var resource = jobResource();
+            var p = resource
+                        .get_metaxcan_parameters({user_id: service.user.id, job_id:job.id})
+                        .$promise
+            return p;
+        }
+
+        function jobResource() {
+            var resource = $resource("api/users/:user_id/jobs/:job_id/metaxcan_parameters/", {}, {
+                get_metaxcan_parameters: {
+                    method:"GET",
+                    interceptor:{response: metaxcanParametersSuccessCallback, responseError:metaxcanErrorCallback},
+                    headers:{'Authorization':(' Token '+service.token), 'kk':'kk'}
+                },
+            });
+            return resource;
+        }
+
+        function metaxcanParametersSuccessCallback(response) {
+            parameters = response.data;
+            if (parameters && "snp_column" in parameters) {
+                service.metaxcanParameters = parameters;
+            }
+            service.error = null;
+            return service.metaxcanParameters;
+        }
+
+        function metaxcanErrorCallback(response) {
+            message = "Something went wrong with the metaxcan parameters";
+            return handleError(message, response);
         }
     }
 

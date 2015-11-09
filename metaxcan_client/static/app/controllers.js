@@ -1,4 +1,4 @@
-(function(){
+(function(){stop
     'use strict';
 
     /* Controllers */

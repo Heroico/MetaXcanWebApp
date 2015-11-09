@@ -55,6 +55,7 @@
         function activeJobUpdated(activeJob) {
             vm.activeJob = activeJob;
             if (activeJob) {
+                $timeout(function() { usSpinnerService.spin('my_spinner');}, 100);
                 vm.message = "Found active job, refreshing";
                 jobService.getMetaxcanParameters(jobService.activeJob).then(metaxcanParametersCallback);
             }
@@ -65,6 +66,7 @@
         }
 
         function metaxcanParametersCallback(result) {
+            $timeout(function() { usSpinnerService.stop('my_spinner'); }, 100);
             if (result && "message" in result) {
                 errorHandler(result);
             } else {

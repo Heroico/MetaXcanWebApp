@@ -6,7 +6,7 @@ from .transcriptome_model_database import TranscriptomeModelDB
 
 class MetaxcanParameters(models.Model):
     owner = models.ForeignKey(User)
-    transcriptome = models.OneToOneField(TranscriptomeModelDB, null=True, blank=True, default = None)
+    transcriptome = models.ForeignKey(TranscriptomeModelDB, null=True, blank=True, default = None)
     snp_column = models.CharField(max_length=50, default="SNP")
     other_allele_column = models.CharField(max_length=50, default="A1")
     effect_allele_column = models.CharField(max_length=50, default="A2")

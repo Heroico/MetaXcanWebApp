@@ -9,6 +9,7 @@
         service.getActiveJob = getActiveJob;
         service.createMetaxcanJob = createMetaxcanJob;
         service.getMetaxcanParameters = getMetaxcanParameters;
+        service.updateMetaxcanParameters = updateMetaxcanParameters;
         service.JOB_SERVICE_READY_NOTIFICATION = "jobs:ready";
         service.JOB_SERVICE_DOWN_NOTIFICATION = "jobs:down";
         service.ready = false;
@@ -134,6 +135,14 @@
             return p;
         }
 
+        function updateMetaxcanParameters(parameters) {
+            var resource = jobResource();
+            var p = resource
+                        .patch_metaxcan_parameters({user_id: service.user.id, job_id:job.id}, parameters)
+                        .$promise
+            return p;
+        }
+
         function jobResource() {
             var resource = $resource("api/users/:user_id/jobs/:job_id/metaxcan_parameters/", {}, {
                 get_metaxcan_parameters: {
@@ -141,6 +150,11 @@
                     interceptor:{response: metaxcanParametersSuccessCallback, responseError:metaxcanErrorCallback},
                     headers:{'Authorization':(' Token '+service.token), 'kk':'kk'}
                 },
+                patch_metaxcan_parameters:{
+                    method:"PATCH",
+                    interceptor:{response: metaxcanParametersSuccessCallback, responseError:metaxcanErrorCallback},
+                    headers:{'Authorization':(' Token '+service.token), 'kk':'kk'}
+                }
             });
             return resource;
         }
@@ -149,6 +163,10 @@
             parameters = response.data;
             if (parameters && "snp_column" in parameters) {
                 service.metaxcanParameters = parameters;
+                //TODO: workaround until API gets defined
+                if (service.metaxcanParameters.transcriptome == null) {
+                    delete service.metaxcanParameters.transcriptome
+                }
             }
             service.error = null;
             return service.metaxcanParameters;
@@ -156,6 +174,7 @@
 
         function metaxcanErrorCallback(response) {
             message = "Something went wrong with the metaxcan parameters";
+            console.log(JSON.stringify(response));
             return handleError(message, response);
         }
     }

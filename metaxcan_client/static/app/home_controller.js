@@ -1,14 +1,19 @@
 (function(){
     'use strict';
 
+    /**
+     * This controller has very little UI. It is meant as an entry point where services should be kicked off.
+     */
     angular.module('metaxcanClientControllers')
         .controller('HomeCtrl',
             ["$scope", "$location", "$timeout", "ngDialog",
-            "userService", "jobService", "usSpinnerService",
+            "userService", "jobService", "transcriptomeService", "usSpinnerService",
             "paths",
             home]);
 
-    function home($scope, $location, $timeout, ngDialog, userService, jobService, usSpinnerService, paths) {
+    function home($scope, $location, $timeout, ngDialog,
+            userService, jobService, transcriptomeService, usSpinnerService, paths) {
+
         var vm = this;
         vm.onCreateMetaxcan = onCreateMetaxcan;
         vm.loggedin = userService.loggedin();
@@ -33,11 +38,16 @@
         }
 
         function refresh() {
-            //workaround for stupid spinner bug
             $timeout(function() {
                 usSpinnerService.spin('my_spinner');
             }, 100);
-            jobService.getActiveJob().then(activeJobCallback)
+            transcriptomeService.getTranscriptomes().then(function(result){
+                if (transcriptomeService.error) {
+                    errorHandler(transcriptomeService.error)
+                } else {
+                    jobService.getActiveJob().then(activeJobCallback)
+                }
+            })
         }
 
         function activeJobCallback(result) {

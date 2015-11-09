@@ -52,6 +52,17 @@
   </div>
   <div class="row">
     <div class="col-md-4"></div>
+    <div class="col-md-1 center-component">
+      Transcriptome Model
+    </div>
+    <div class="col-md-3 center-component">
+      <select ng-model="vm.parameters.transcriptome" convert-to-number class="form-control" id="transcriptomeSelect">
+        <option ng-repeat="t in vm.transcriptomes" value="{{t.id}}">{{t.name}}</option>
+      </select>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-4"></div>
     <div class="col-md-4 center-component">
       <button class="btn btn-lg btn-primary btn-block" type="submit">Start</button>
     </div>

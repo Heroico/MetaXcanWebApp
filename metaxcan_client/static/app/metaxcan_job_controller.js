@@ -3,21 +3,29 @@
 
     /* Controllers */
     angular.module('metaxcanClientControllers')
-        .controller('MetaxcanJobCtrl', ["$scope", "jobService",
-            "usSpinnerService",
+        .controller('MetaxcanJobCtrl', ["$scope", "$location", "usSpinnerService",
+            "jobService", "transcriptomeService", "paths",
             metaxcanJobController]);
 
-    function metaxcanJobController($scope, jobService, usSpinnerService){
+    function metaxcanJobController($scope, $location, usSpinnerService,
+                jobService, transcriptomeService, paths){
         var vm = this;
         vm.job = jobService.activeJob;
         vm.parameters =  {};
         vm.message = null;
+        vm.transcriptomes = null;
 
         vm.start = start
 
         initialise();
 
         function initialise() {
+            if (jobService.activeJob == null) {
+                $location.path(paths.home);
+                return
+            }
+
+            vm.transcriptomes = transcriptomeService.transcriptomes;
             parametersUpdated(jobService.metaxcanParameters);
         }
 
@@ -44,6 +52,11 @@
         function parametersUpdated(parameters, message) {
              vm.parameters = parameters
              vm.message = message ? message : null;
+
+             if (vm.parameters.transcriptome == null) {
+                var t = vm.transcriptomes[0];
+                vm.parameters.transcriptome = t.id;
+             }
         }
 
         function doStart() {

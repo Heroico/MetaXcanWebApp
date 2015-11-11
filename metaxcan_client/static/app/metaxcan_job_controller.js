@@ -3,17 +3,18 @@
 
     /* Controllers */
     angular.module('metaxcanClientControllers')
-        .controller('MetaxcanJobCtrl', ["$scope", "$location", "usSpinnerService",
+        .controller('MetaxcanJobCtrl', ["$scope", "$location", "usSpinnerService", "Upload",
             "jobService", "transcriptomeService", "paths",
             metaxcanJobController]);
 
-    function metaxcanJobController($scope, $location, usSpinnerService,
+    function metaxcanJobController($scope, $location, usSpinnerService, Upload,
                 jobService, transcriptomeService, paths){
         var vm = this;
         vm.job = jobService.activeJob;
         vm.parameters =  {};
         vm.message = null;
         vm.transcriptomes = null;
+        vm.uploadFiles = uploadFiles
 
         vm.start = start
 
@@ -61,6 +62,16 @@
 
         function doStart() {
             alert("howdy");
+        }
+
+/* */
+
+        function uploadFiles(files, errFiles) {
+            console.log("upload files")
+            console.log("errorFile:"+JSON.stringify(errFiles))
+            angular.forEach(files, function(file) {
+                console.log(JSON.stringify(file))
+            });
         }
     };
 

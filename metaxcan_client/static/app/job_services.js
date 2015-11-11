@@ -1,8 +1,9 @@
 (function(){
     angular.module('metaxcanClientServices')
-        .factory('jobService', ['$rootScope', '$resource', 'userService', jobService])
+        .factory('jobService', ['$rootScope', '$resource', 'userService', 'fileService',
+         jobService])
 
-    function jobService($rootScope, $resource, userService){
+    function jobService($rootScope, $resource, userService, fileService){
         var service = {}
         service.updateToken = updateToken;
         service.updateUser = updateUser;
@@ -10,6 +11,7 @@
         service.createMetaxcanJob = createMetaxcanJob;
         service.getMetaxcanParameters = getMetaxcanParameters;
         service.updateMetaxcanParameters = updateMetaxcanParameters;
+        service.getJobFiles = getJobFiles
         service.JOB_SERVICE_READY_NOTIFICATION = "jobs:ready";
         service.JOB_SERVICE_DOWN_NOTIFICATION = "jobs:down";
         service.ready = false;
@@ -17,11 +19,13 @@
         service.metaxcanParameters = null;
         service.user =null;
         service.error = null;
+        service.files = [];
 
         initialice();
 
         return service;
 
+/* Setup */
         function initialice() {
             service.updateToken(userService.token);
             service.updateUser(userService.user);
@@ -65,6 +69,9 @@
                 $rootScope.$broadcast(service.JOB_SERVICE_DOWN_NOTIFICATION);
             }
         }
+
+
+/* Metaxcan Jobs */
 
         // Returns a promise of active job. In case of error, the promise will be fillled an "{errorMessage;'some error message'}" object
         function getActiveJob() {
@@ -127,6 +134,8 @@
             return service.error;
         }
 
+/* Metaxcan parameters */
+
         function getMetaxcanParameters(job) {
             var resource = jobResource();
             var p = resource
@@ -174,6 +183,37 @@
 
         function metaxcanErrorCallback(response) {
             message = "Something went wrong with the metaxcan parameters";
+            return handleError(message, response);
+        }
+
+/* Files */
+        function getJobFiles(job) {
+            var resource = filesResource();
+            var p = resource.get_files({user_id:service.user.id, job_id:job.id}).$promise;
+            return p;
+        }
+
+        function filesResource() {
+                var resource = $resource("api/users/:user_id/jobs/:job_id/files/", {}, {
+                get_files: {
+                    method:"GET",
+                    isArray:true,
+                    interceptor:{response: filesSuccessCallback, responseError:filesErrorCallback},
+                    headers:{'Authorization':(' Token '+service.token), 'kk':'kk'}
+                }
+            });
+            return resource;
+        }
+
+        function filesSuccessCallback(response) {
+            console.log(JSON.stringify(response))
+            service.error = null
+            service.files = response.data;
+            return service.files;
+        }
+
+        function filesErrorCallback(response) {
+            message = "Something went wrong with the job files";
             console.log(JSON.stringify(response));
             return handleError(message, response);
         }

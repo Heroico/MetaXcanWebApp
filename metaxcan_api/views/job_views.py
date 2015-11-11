@@ -7,14 +7,14 @@ from rest_framework.exceptions import PermissionDenied, NotAuthenticated, NotFou
 from rest_framework.response import Response
 from rest_framework.viewsets import ReadOnlyModelViewSet
 from rest_framework.decorators import list_route, detail_route
-from django.contrib.auth.models import User
+from .utilities import AuthenticatedUserMixin
 from metaxcan_api.serializers import JobSerializer, MetaxcanParametersSerializer
 from metaxcan_api.permissions import AuthenticatedOwnerPermission
 from metaxcan_api.models import Job, MetaxcanParameters
 
 #http://stackoverflow.com/questions/16857450/how-to-register-users-in-django-rest-framework
 
-class JobViewSet(ReadOnlyModelViewSet):
+class JobViewSet(AuthenticatedUserMixin, ReadOnlyModelViewSet):
     serializer_class = JobSerializer
     permission_classes = (AuthenticatedOwnerPermission, )
 
@@ -58,17 +58,6 @@ class JobViewSet(ReadOnlyModelViewSet):
         job = serializer.save(owner=user)
         headers = self.get_success_headers(serializer.data)
         return job, headers
-
-    def get_authenticated_user(self):
-        if not self.request.user.is_authenticated():
-            raise NotAuthenticated
-        user_id = self.kwargs['user_pk']
-        candidates = User.objects.filter(id=user_id).filter(id=self.request.user.id)
-        if candidates.count() != 1:
-            raise PermissionDenied
-        else:
-            user = candidates[0]
-        return user
 
     def get_metaxcan_parameters_serializer(self, *args, **kwargs):
         kwargs['context'] = self.get_serializer_context()

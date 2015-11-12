@@ -4,6 +4,7 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
 from .metaxcan_parameters import MetaxcanParameters
+from .data_file import DataFile
 
 class JobStateEnum(object):
     CREATED="created"
@@ -20,6 +21,8 @@ class Job(models.Model):
     created_date = models.DateTimeField('date created', default=timezone.now)
 
     metaxcan_parameters = models.OneToOneField(MetaxcanParameters, blank=True, null=True, default=None)
+
+    files = models.ManyToManyField(DataFile)
 
     def __str__(self):
         t = self.title if self.title else "Untitled Job"

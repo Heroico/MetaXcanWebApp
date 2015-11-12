@@ -14,4 +14,4 @@ class MetaxcanParametersSerializer(serializers.HyperlinkedModelSerializer):
         fields = ('owner', 'transcriptome', 'snp_column',
                   'other_allele_column', 'effect_allele_column',
                   'beta_column', 'beta_sign_column', 'odd_ratio_column',
-                  'p_column', )
+                  'p_column', 'compressed', 'separator')

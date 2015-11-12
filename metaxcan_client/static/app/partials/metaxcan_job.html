@@ -53,12 +53,20 @@
   <div class="row">
     <div class="col-md-4"></div>
     <div class="col-md-1 center-component">
-      Transcriptome Model
+      <div>Transcriptome Model</div>
     </div>
     <div class="col-md-3 center-component">
       <select ng-model="vm.parameters.transcriptome" convert-to-number class="form-control" id="transcriptomeSelect">
         <option ng-repeat="t in vm.transcriptomes" value="{{t.id}}">{{t.name}}</option>
       </select>
+      <div class="left-to-center">
+        <input type="checkbox"  ng-model="vm.parameters.compressed"> Files Are GZipped Compressed
+      </div>
+      <div class="form-control-wrapper">
+        <input ng-model="vm.parameters.separator" type="text" class="form-control" id="separator">
+        <div class="floating-label">Separator character</div>
+        <span class="material-input"></span>
+      </div>
     </div>
   </div>
   <div class="row">
@@ -93,6 +101,11 @@
     }
     .center-component {
       padding: 15px 10px 15px 10px;
+    }
+    .left-to-center {
+      margin: 15px 0px 15px 0px;
+      padding: 15px 0px 15px 0px;
+      text-align: left;
     }
   </style>
 </form>

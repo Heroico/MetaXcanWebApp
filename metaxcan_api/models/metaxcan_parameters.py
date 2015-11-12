@@ -15,4 +15,4 @@ class MetaxcanParameters(models.Model):
     beta_sign_column = models.CharField(max_length=50, blank=True)
     p_column = models.CharField(max_length=50, blank=True)
     compressed = models.BooleanField(default=False)
-    separator = models.CharField(max_length=10, default=None, blank=True)
+    separator = models.CharField(max_length=10, default=None, blank=True) #Care! Due to sanitation, might be "\\t"

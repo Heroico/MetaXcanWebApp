@@ -66,6 +66,7 @@ class JobViewSet(AuthenticatedUserMixin, ReadOnlyModelViewSet):
 
     @detail_route(methods=['get', 'patch'])
     def metaxcan_parameters(self, request, user_pk, pk=None, *args, **kwargs):
+        print(self.request.data)
         user = self.get_authenticated_user()
         jobs = Job.objects.filter(id=pk)
         job = jobs[0] if jobs.count() == 1 else None

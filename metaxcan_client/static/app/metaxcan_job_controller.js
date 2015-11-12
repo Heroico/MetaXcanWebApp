@@ -15,6 +15,7 @@
         vm.message = null;
         vm.transcriptomes = null;
         vm.uploadFiles = uploadFiles
+        vm.jobService = jobService
 
         vm.start = start
 
@@ -67,10 +68,10 @@
 /* */
 
         function uploadFiles(files, errFiles) {
-            console.log("upload files")
-            console.log("errorFile:"+JSON.stringify(errFiles))
+            //console.log("upload files")
+            //console.log("errorFile:"+JSON.stringify(errFiles))
             angular.forEach(files, function(file) {
-                console.log(JSON.stringify(file))
+                jobService.uploadJobFile(file)
             });
         }
     };

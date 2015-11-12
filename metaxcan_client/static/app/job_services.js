@@ -1,9 +1,11 @@
 (function(){
     angular.module('metaxcanClientServices')
-        .factory('jobService', ['$rootScope', '$resource', 'userService', 'fileService',
+        .factory('jobService',
+        ['$rootScope', '$resource', "$timeout",
+        'userService', 'Upload',
          jobService])
 
-    function jobService($rootScope, $resource, userService, fileService){
+    function jobService($rootScope, $resource, $timeout, userService, Upload){
         var service = {}
         service.updateToken = updateToken;
         service.updateUser = updateUser;
@@ -12,14 +14,9 @@
         service.getMetaxcanParameters = getMetaxcanParameters;
         service.updateMetaxcanParameters = updateMetaxcanParameters;
         service.getJobFiles = getJobFiles
+        service.uploadJobFile = uploadJobFile
         service.JOB_SERVICE_READY_NOTIFICATION = "jobs:ready";
         service.JOB_SERVICE_DOWN_NOTIFICATION = "jobs:down";
-        service.ready = false;
-        service.activeJob = null;
-        service.metaxcanParameters = null;
-        service.user =null;
-        service.error = null;
-        service.files = [];
 
         initialice();
 
@@ -27,6 +24,15 @@
 
 /* Setup */
         function initialice() {
+            service.ready = false;
+            service.activeJob = null;
+            service.metaxcanParameters = null;
+            service.user =null;
+            service.error = null;
+            service.files = [];
+            service.uploadFiles = []
+            service.failedFiles = []
+
             service.updateToken(userService.token);
             service.updateUser(userService.user);
 
@@ -70,6 +76,10 @@
             }
         }
 
+        function authorization() {
+            var a = ' Token '+service.token
+            return a;
+        }
 
 /* Metaxcan Jobs */
 
@@ -80,7 +90,7 @@
                     method:"GET",
                     isArray:false,
                     interceptor:{response:jobSuccessCallback, responseError:jobErrorCallback},
-                    headers:{'Authorization':(' Token '+service.token), 'kk':'kk'}
+                    headers:{'Authorization': authorization() }
                 },
             });
 
@@ -96,7 +106,7 @@
                     method:"POST",
                     isArray:false,
                     interceptor:{response:jobSuccessCallback, responseError:jobErrorCallback},
-                    headers:{'Authorization':(' Token '+service.token), 'kk':'kk'}
+                    headers:{'Authorization': authorization() }
                 },
             });
 
@@ -157,12 +167,12 @@
                 get_metaxcan_parameters: {
                     method:"GET",
                     interceptor:{response: metaxcanParametersSuccessCallback, responseError:metaxcanErrorCallback},
-                    headers:{'Authorization':(' Token '+service.token), 'kk':'kk'}
+                    headers:{'Authorization': authorization() }
                 },
                 patch_metaxcan_parameters:{
                     method:"PATCH",
                     interceptor:{response: metaxcanParametersSuccessCallback, responseError:metaxcanErrorCallback},
-                    headers:{'Authorization':(' Token '+service.token), 'kk':'kk'}
+                    headers:{'Authorization': authorization() }
                 }
             });
             return resource;
@@ -199,14 +209,13 @@
                     method:"GET",
                     isArray:true,
                     interceptor:{response: filesSuccessCallback, responseError:filesErrorCallback},
-                    headers:{'Authorization':(' Token '+service.token), 'kk':'kk'}
+                    headers:{'Authorization': authorization() }
                 }
             });
             return resource;
         }
 
         function filesSuccessCallback(response) {
-            console.log(JSON.stringify(response))
             service.error = null
             service.files = response.data;
             return service.files;
@@ -216,6 +225,64 @@
             message = "Something went wrong with the job files";
             console.log(JSON.stringify(response));
             return handleError(message, response);
+        }
+
+        /* Expects a file as returned by AngularFileUpload. Can accept a progress callback */
+        //http://stackoverflow.com/questions/20473572/django-rest-framework-file-upload
+        function uploadJobFile(f) {
+            console.log("Upload")
+            // Seems that angular file upload gets called multiple times.
+            if (!checkDupFile(f)) {
+                console.log("Dup")
+                return null;
+            }
+
+            path = buildJobFilesPath();
+            f.upload = Upload.upload( {
+                url: path,
+                data: {name: f.name, file:f},
+                headers: {'Authorization': authorization()},
+            });
+
+            service.uploadFiles.push(f);
+
+            var p = f.upload.then(function (response) {
+                service.files.push(response.data);
+                service.uploadFiles = _.reject(service.uploadFiles, function(el){ return el.name === f.name; } );
+                return response;
+            }, function (response) {
+                f.error = "Error:"+response.status + ":" + JSON.stringify(response.data)
+                service.failedFiles.push(f);
+                service.uploadFiles = _.reject(service.uploadFiles, function(el){ return el.name === f.name; } );
+                return response;
+            }, function (evt) {
+                f.progress = Math.min(100, parseInt(100.0 * evt.loaded / evt.total));
+                return evt
+            });
+
+            return p;
+        }
+
+        function checkDupFile(f) {
+            var found = _.find(service.files, function(el){ return el.name === f.name; })
+            if (found) return false;
+
+            found = _.find(service.uploadFiles, function(el){ return el.name === f.name; })
+            if (found) return false;
+
+            found = _.find(service.failedFiles, function(el){ return el.name === f.name; })
+            if (found) return false;
+
+            return true
+        }
+
+        function buildJobFilesPath() {
+            path = "api/users/"+
+                service.user.id +
+                "/jobs/"+
+                service.activeJob.id+
+                "/files/";
+            return path;
         }
     }
 

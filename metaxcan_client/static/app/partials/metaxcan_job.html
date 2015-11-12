@@ -64,9 +64,20 @@
   <div class="row">
     <div class="col-md-4"></div>
     <div class="col-md-4 center-component">
-        <button type="file" class="btn btn-primary" ngf-select="vm.uploadFiles($files, $invalidFiles)" multiple ngf-pattern=".txt,.gz">
-          Select Files
-        </button>
+      <button type="file" class="btn btn-primary" ngf-select="vm.uploadFiles($files, $invalidFiles)" ngf-multiple="true" ngf-pattern=".txt,.gz">
+        Select Files
+      </button>
+      <ul>
+        <li ng-repeat="f in vm.jobService.uploadFiles" style="font:smaller">{{f.name}} {{f.error}}
+          <span class="progress" ng-show="f.progress >= 0">
+            <div style="width:{{f.progress}}%" ng-bind="f.progress + '%'"></div>
+          </span>
+        </li>
+        <li ng-repeat="f in vm.jobService.failedFiles" style="font:smaller">{{f.name}} {{f.error}} {{f.$error}} {{f.$errorParam}}
+        </li>
+        <li ng-repeat="f in vm.jobService.files" style="font:smaller">{{f.name}}
+        </li>
+      </ul>
     </div>
   </div>
   <div class="row">

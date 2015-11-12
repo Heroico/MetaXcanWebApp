@@ -251,7 +251,16 @@
                 service.uploadFiles = _.reject(service.uploadFiles, function(el){ return el.name === f.name; } );
                 return response;
             }, function (response) {
-                f.error = "Error:"+response.status + ":" + JSON.stringify(response.data)
+                var message = "Error:"+response.status
+                var error = response.data;
+                if (error && typeof error === "object" && "detail" in error ) {
+                    message = message + ":" + error.detail;
+                } else if (error && typeof error === "object" && "file" in error ) {
+                    message = message + ":" + error.file;
+                } else if (error) {
+                    message = message + ":" + JSON.stringify(error)
+                }
+                f.error = message;
                 service.failedFiles.push(f);
                 service.uploadFiles = _.reject(service.uploadFiles, function(el){ return el.name === f.name; } );
                 return response;

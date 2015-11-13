@@ -118,7 +118,7 @@
         }
 
         function jobSuccessCallback(response) {
-            job = response.data;
+            var job = response.data;
             if (job && "id" in job) {
                 service.job = job;
             }
@@ -146,7 +146,12 @@
         }
 
 
-        function startJob() {
+        function startJob(job) {
+            var resource = jobResource();
+            var p = resource
+                        .start_job({user_id: service.user.id, job_id:job.id}, {})
+                        .$promise
+            return p;
         }
 
         function jobResource() {
@@ -162,9 +167,20 @@
                     method:"PATCH",
                     interceptor:{response: metaxcanParametersSuccessCallback, responseError:metaxcanErrorCallback},
                     headers:{'Authorization': authorization() }
-                }
+                },
+                start_job:{
+                    url:"api/users/:user_id/jobs/:job_id/start/",
+                    method:"POST",
+                    interceptor:{response: jobSuccessCallback, responseError:jobStartErrorCallback},
+                    headers:{'Authorization': authorization() }
+                },
             });
             return resource;
+        }
+
+        function jobStartErrorCallback(response) {
+            message = "Something went wrong when starting the Job";
+            return handleError(message, response);
         }
 
 /* Metaxcan parameters */

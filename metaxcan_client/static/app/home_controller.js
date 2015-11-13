@@ -93,7 +93,6 @@
         }
 
         function refreshComplete() {
-            console.log("complete " + paths.metaxcan_job_path)
             $timeout(function() { usSpinnerService.stop('my_spinner');}, 100);
             vm.message = "Refreshed parameters, redirecting";
             $location.path(paths.metaxcan_job_path);

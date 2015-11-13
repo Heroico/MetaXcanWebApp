@@ -50,7 +50,7 @@
             }
         }
 
-       function errorHandler(error) {
+        function errorHandler(error) {
             vm.message = error.message;
         }
 
@@ -65,14 +65,18 @@
         }
 
         function doStart() {
-            alert("howdy");
+            jobService.startJob(jobService.job).then(function(result){
+                if (! jobService.error ) {
+                    usSpinnerService.spin('mp_spinner'); //workaround to spinner race condition
+                } else {
+                    vm.message = jobService.error.message;
+                }
+            });
         }
 
 /* */
 
         function uploadFiles(files, errFiles) {
-            //console.log("upload files")
-            //console.log("errorFile:"+JSON.stringify(errFiles))
             angular.forEach(files, function(file) {
                 jobService.uploadJobFile(file)
             });

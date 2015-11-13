@@ -3,11 +3,11 @@
 
     /* Controllers */
     angular.module('metaxcanClientControllers')
-        .controller('MetaxcanJobCtrl', ["$scope", "$location", "usSpinnerService", "Upload",
+        .controller('MetaxcanJobCtrl', ["$scope", "$location", "$timeout", "usSpinnerService", "Upload",
             "jobService", "transcriptomeService", "paths",
             metaxcanJobController]);
 
-    function metaxcanJobController($scope, $location, usSpinnerService, Upload,
+    function metaxcanJobController($scope, $location, $timeout, usSpinnerService, Upload,
                 jobService, transcriptomeService, paths){
         var vm = this;
         vm.parameters =  {};
@@ -26,6 +26,10 @@
                 return
             }
 
+            if (jobService.job.state == "running") {
+                $timeout(function() { usSpinnerService.spin('mp_spinner');}, 100); //workaround to spinner race condition
+            }
+
             vm.transcriptomes = transcriptomeService.transcriptomes;
             parametersUpdated(jobService.metaxcanParameters);
         }
@@ -33,7 +37,7 @@
         function start() {
             usSpinnerService.spin('mp_spinner');
             vm.message = "Updating parameters";
-            jobService.updateMetaxcanParameters(vm.parameters).then(updateParametersCallback);
+            jobService.updateMetaxcanParameters(vm.jobService.job, vm.parameters).then(updateParametersCallback);
         }
 
         function updateParametersCallback(result) {

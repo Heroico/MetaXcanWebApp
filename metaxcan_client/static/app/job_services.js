@@ -15,6 +15,7 @@
         service.updateMetaxcanParameters = updateMetaxcanParameters;
         service.getJobFiles = getJobFiles
         service.uploadJobFile = uploadJobFile
+        service.startJob = startJob
         service.JOB_SERVICE_READY_NOTIFICATION = "jobs:ready";
         service.JOB_SERVICE_DOWN_NOTIFICATION = "jobs:down";
 
@@ -144,6 +145,28 @@
             return service.error;
         }
 
+
+        function startJob() {
+        }
+
+        function jobResource() {
+            var resource = $resource("api/users/:user_id/jobs/:job_id/", {}, {
+                get_metaxcan_parameters: {
+                    url:"api/users/:user_id/jobs/:job_id/metaxcan_parameters/",
+                    method:"GET",
+                    interceptor:{response: metaxcanParametersSuccessCallback, responseError:metaxcanErrorCallback},
+                    headers:{'Authorization': authorization() }
+                },
+                patch_metaxcan_parameters:{
+                    url:"api/users/:user_id/jobs/:job_id/metaxcan_parameters/",
+                    method:"PATCH",
+                    interceptor:{response: metaxcanParametersSuccessCallback, responseError:metaxcanErrorCallback},
+                    headers:{'Authorization': authorization() }
+                }
+            });
+            return resource;
+        }
+
 /* Metaxcan parameters */
 
         function getMetaxcanParameters(job) {
@@ -154,28 +177,12 @@
             return p;
         }
 
-        function updateMetaxcanParameters(parameters) {
+        function updateMetaxcanParameters(job, parameters) {
             var resource = jobResource();
             var p = resource
                         .patch_metaxcan_parameters({user_id: service.user.id, job_id:job.id}, parameters)
                         .$promise
             return p;
-        }
-
-        function jobResource() {
-            var resource = $resource("api/users/:user_id/jobs/:job_id/metaxcan_parameters/", {}, {
-                get_metaxcan_parameters: {
-                    method:"GET",
-                    interceptor:{response: metaxcanParametersSuccessCallback, responseError:metaxcanErrorCallback},
-                    headers:{'Authorization': authorization() }
-                },
-                patch_metaxcan_parameters:{
-                    method:"PATCH",
-                    interceptor:{response: metaxcanParametersSuccessCallback, responseError:metaxcanErrorCallback},
-                    headers:{'Authorization': authorization() }
-                }
-            });
-            return resource;
         }
 
         function metaxcanParametersSuccessCallback(response) {

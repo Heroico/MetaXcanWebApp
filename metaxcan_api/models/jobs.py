@@ -32,7 +32,7 @@ class Job(models.Model):
 
     @classmethod
     def active_job(cls, owner):
-        results = Job.objects.filter(state="created", owner=owner)
+        results = Job.objects.filter(state__in=[JobStateEnum.CREATED, JobStateEnum.RUNNING], owner=owner)
         if results.count() > 0:
             return results[0]
 

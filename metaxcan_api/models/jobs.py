@@ -3,6 +3,7 @@ __author__ = 'heroico'
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
+from django.utils.translation import ugettext_lazy as _
 from .metaxcan_parameters import MetaxcanParameters
 from .data_file import DataFile
 
@@ -36,3 +37,9 @@ class Job(models.Model):
             return results[0]
 
         return None
+
+    def start(self):
+        if self.state != JobStateEnum.CREATED:
+            raise Exception(_("Can't start that which already is started"))
+        self.state = JobStateEnum.RUNNING
+        self.save()

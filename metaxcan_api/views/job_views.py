@@ -1,6 +1,6 @@
 __author__ = 'heroico'
 
-import copy
+from django.utils.translation import ugettext_lazy as _
 from rest_framework import status
 from rest_framework.settings import api_settings
 from rest_framework.exceptions import PermissionDenied, NotAuthenticated, NotFound, ParseError
@@ -10,7 +10,7 @@ from rest_framework.decorators import list_route, detail_route
 from .utilities import AuthenticatedUserMixin, GetJobMixin
 from metaxcan_api.serializers import JobSerializer, MetaxcanParametersSerializer
 from metaxcan_api.permissions import AuthenticatedOwnerPermission
-from metaxcan_api.models import Job, MetaxcanParameters
+from metaxcan_api.models import Job, JobStateEnum, MetaxcanParameters
 
 #http://stackoverflow.com/questions/16857450/how-to-register-users-in-django-rest-framework
 
@@ -68,7 +68,12 @@ class JobViewSet(AuthenticatedUserMixin,
 
     @detail_route(methods=['post'])
     def start(self, request, user_pk, pk=None, *args, **kwargs):
-        return Response()
+        job = self.get_job(pk)
+        if job.state != JobStateEnum.CREATED:
+            raise PermissionDenied(_("Cannot start job that is already started"))
+        job.start()
+        data = self.get_serializer(job).data if job else None
+        return Response(data)
 
     @detail_route(methods=['get', 'patch'])
     def metaxcan_parameters(self, request, user_pk, pk=None, *args, **kwargs):

@@ -10,7 +10,6 @@
     function metaxcanJobController($scope, $location, usSpinnerService, Upload,
                 jobService, transcriptomeService, paths){
         var vm = this;
-        vm.job = jobService.activeJob;
         vm.parameters =  {};
         vm.message = null;
         vm.transcriptomes = null;
@@ -22,7 +21,7 @@
         initialise();
 
         function initialise() {
-            if (jobService.activeJob == null) {
+            if (jobService.job == null) {
                 $location.path(paths.home);
                 return
             }

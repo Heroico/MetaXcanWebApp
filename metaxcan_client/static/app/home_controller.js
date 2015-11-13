@@ -18,7 +18,7 @@
         vm.onCreateMetaxcan = onCreateMetaxcan;
         vm.loggedin = userService.loggedin();
         vm.user = userService.user;
-        vm.activeJob = null;
+        vm.job = null;
         vm.error = null;
 
         initialise();
@@ -66,11 +66,11 @@
         }
 
         function activeJobUpdated(activeJob) {
-            vm.activeJob = activeJob;
+            vm.job = activeJob;
             if (activeJob) {
                 $timeout(function() { usSpinnerService.spin('my_spinner');}, 100);
                 vm.message = "Found active job, refreshing";
-                jobService.getMetaxcanParameters(jobService.activeJob).then(metaxcanParametersCallback);
+                jobService.getMetaxcanParameters(jobService.job).then(metaxcanParametersCallback);
             } else {
                 $timeout(function() { usSpinnerService.stop('my_spinner');}, 100);
             }
@@ -80,7 +80,7 @@
             if (result && "message" in result) {
                 errorHandler(result);
             } else {
-                jobService.getJobFiles(jobService.activeJob).then(jobFilesCallback)
+                jobService.getJobFiles(jobService.job).then(jobFilesCallback)
             }
         }
 
@@ -93,9 +93,10 @@
         }
 
         function refreshComplete() {
+            console.log("complete " + paths.metaxcan_job_path)
             $timeout(function() { usSpinnerService.stop('my_spinner');}, 100);
-             vm.message = "Refreshed parameters, redirecting";
-             $location.path(paths.metaxcan_job_path);
+            vm.message = "Refreshed parameters, redirecting";
+            $location.path(paths.metaxcan_job_path);
         }
 
 /* Create Metaxcan job event */

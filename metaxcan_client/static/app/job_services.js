@@ -25,7 +25,7 @@
 /* Setup */
         function initialice() {
             service.ready = false;
-            service.activeJob = null;
+            service.job = null;
             service.metaxcanParameters = null;
             service.user =null;
             service.error = null;
@@ -119,10 +119,10 @@
         function jobSuccessCallback(response) {
             job = response.data;
             if (job && "id" in job) {
-                service.activeJob = job;
+                service.job = job;
             }
             service.error = null;
-            return service.activeJob;
+            return service.job;
         }
 
         function jobErrorCallback(response) {
@@ -140,7 +140,7 @@
                 }
             }
             service.error = {message:message};
-            service.activeJob = null;
+            service.job = null;
             return service.error;
         }
 
@@ -289,7 +289,7 @@
             path = "api/users/"+
                 service.user.id +
                 "/jobs/"+
-                service.activeJob.id+
+                service.job.id+
                 "/files/";
             return path;
         }

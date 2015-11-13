@@ -6,6 +6,8 @@
       <span us-spinner="{radius:10, width:4, length: 8}" spinner-key="mp_spinner"></span>
     </div>
   </div>
+  <fieldset ng-disabled="vm.jobService.job.state != 'created'">
+  <!-- unindented for laziness-->
   <div class="row">
     <div class="col-md-3"></div>
     <div class="col-md-2">
@@ -94,6 +96,8 @@
       <button class="btn btn-lg btn-primary btn-block" ng-click="vm.start()">Start</button>
     </div>
   </div>
+  <!-- unindented for laziness -->
+  </fieldset>
   {{vm.message}}
   <style>
     .form-control-wrapper {

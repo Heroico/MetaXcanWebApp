@@ -1,7 +1,8 @@
 __author__ = 'heroico'
 
-from rest_framework.exceptions import NotAuthenticated, PermissionDenied
+from rest_framework.exceptions import NotAuthenticated, PermissionDenied, NotFound
 from django.contrib.auth.models import User
+from metaxcan_api import models
 
 class AuthenticatedUserMixin(object):
     def get_authenticated_user(self):
@@ -14,3 +15,14 @@ class AuthenticatedUserMixin(object):
         else:
             user = candidates[0]
         return user
+
+class GetJobMixin(object):
+    def get_job(self, job_pk):
+        user = self.get_authenticated_user()
+        jobs = models.Job.objects.filter(id=job_pk)
+        job = jobs[0] if jobs.count() == 1 else None
+        if not job:
+            raise NotFound
+        if job.owner != user:
+            raise PermissionDenied
+        return job

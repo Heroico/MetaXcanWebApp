@@ -44,7 +44,7 @@ class Job(models.Model):
 
 # crude state machine
     def start(self):
-        if self.state != JobStateEnum.CREATED:
+        if self.state not in [JobStateEnum.CREATED, JobStateEnum.FAILED]:
             raise Exception(_("Can't start that which already is started"))
         self.state = JobStateEnum.RUNNING
         self.save()
@@ -65,19 +65,22 @@ class Job(models.Model):
     def hierarchy_path(self):
         user = self.owner
         hierarchy = os.path.join(str(user.id), str(self.id))
+        if not os.path.exists(hierarchy):
+            os.makedirs(hierarchy)
         return hierarchy
 
     def hierarchy_input_files_path(self):
-        path = self.hierarchy_path()
-        path = os.path.join(path, "input_files")
-        return path
+        return  self.make_subpath("input_files")
 
     def hierarchy_results_path(self):
-        path = self.hierarchy_path()
-        path = os.path.join(path, "results")
-        return path
+        return self.make_subpath("results")
 
     def hierarchy_intermediate_path(self):
+        return self.make_subpath("intermediate")
+
+    def make_subpath(self, sub_path):
         path = self.hierarchy_path()
-        path = os.path.join(path, "intermediate")
+        path = os.path.join(path, sub_path)
+        if not os.path.exists(path):
+            os.makedirs(path)
         return path

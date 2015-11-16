@@ -21,24 +21,49 @@ class MetaxcanParameters(models.Model):
     compressed = models.BooleanField(default=False)
     separator = models.CharField(max_length=10, default=None, blank=True) #Care! Due to sanitation, might be "\\t"
 
-    def run_metaxcan_command(self):
+    def run_metaxcan_03_command(self):
         job = self.job
         p = settings.METAXCAN_PYTHON
-        m = settings.METAXCAN_SOFTWARE
+        m = os.path.join(settings.METAXCAN_SOFTWARE, "M03_betas.py")
 
         command = p + " " + m
+
         if job.metaxcan_parameters.compressed:
-            command += " -compressed"
+            command += " --compressed"
+        if self.separator:
+            command += " --separator " + self.separator
+        command += " --a1_column " + self.other_allele_column
+        command += " --a2_column " + self.effect_allele_column
+        command += " --snp_column " + self.snp_column
+        if self.p_column:
+            command += " --pvalue_column " + self.p_column
 
-        input_path = os.path.join(settings.MEDIA_ROOT, job.hierarchy_input_files_path())
-        command += " --gwas_folder " + input_path
+        if self.beta_column:
+            command += " --beta_column " + self.beta_column
+        elif self.beta_sign_column:
+            command += " --beta_sign_column " + self.beta_sign_column
+        elif self.odd_ratio_column:
+            command += " --or_column " + self.odd_ratio_column
 
-        intermediate_path = os.path.join(settings.MEDIA_ROOT, job.hierarchy_intermediate_path())
-        command += " --beta_folder " + intermediate_path
+        command += " --gwas_folder " + os.path.join(settings.MEDIA_ROOT, job.hierarchy_input_files_path())
+        command += " --output_folder " + os.path.join(settings.MEDIA_ROOT, job.hierarchy_intermediate_path())
+        command += " --weight_db_path " + self.transcriptome.path
 
-        transcriptome_path = self.transcriptome.path
-        command += " --weight_db_path " + transcriptome_path
+        return command
 
-        #TODO: covariance
+    def run_metaxcan_04_command(self):
+        job = self.job
+        p = settings.METAXCAN_PYTHON
+        m = os.path.join(settings.METAXCAN_SOFTWARE, "M04_zscores.py")
+
+        command = p + " " + m
+
+        command += " --weight_db_path " + self.transcriptome.path
+        command += " --covariance_folder " + self.covariance.path
+        command += " --beta_folder " + os.path.join(settings.MEDIA_ROOT, job.hierarchy_intermediate_path())
+
+        results_path = os.path.join(settings.MEDIA_ROOT, job.hierarchy_results_path())
+        results_path = os.path.join(results_path, "results.csv")
+        command += " --output_file " + results_path
 
         return command

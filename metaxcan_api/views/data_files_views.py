@@ -8,6 +8,8 @@ from metaxcan_api.serializers import DataFileSerializer
 from .utilities import GetJobMixin
 from metaxcan_api.permissions import AuthenticatedOwnerPermission
 from django.utils.translation import ugettext_lazy as _
+from django.conf import settings
+import os
 
 class DataFileViewSet(AuthenticatedUserMixin,
                     GetJobMixin,
@@ -37,8 +39,25 @@ class DataFileViewSet(AuthenticatedUserMixin,
         files = job.files.filter(name=name)
         if files.count() > 0:
             raise exceptions.PermissionDenied(_("There is already a file with that name in this job"))
-        f = serializer.save()
-        job.files.add(f)
+        file = serializer.save()
+        self.move_file(job, file)
+        job.files.add(file)
+
+    def move_file(self, job, file):
+        user = job.owner
+        initial_path = file.file.path
+        root = settings.MEDIA_ROOT
+
+        hierarchy = os.path.join(str(user.id), str(job.id))
+        path = os.path.join(root, hierarchy)
+        if not os.path.exists(path):
+            os.makedirs(path)
+        name = os.path.join(hierarchy, file.file.name)
+        file.file.name = name
+
+        final_path = os.path.join(root, file.file.name)
+        os.rename(initial_path, final_path)
+        file.save()
 
     # def perform_create(self, obj):
     #     print (self.request.data)

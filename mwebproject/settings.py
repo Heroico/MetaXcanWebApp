@@ -37,7 +37,8 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    "compressor",
+    'djcelery',
+    'compressor',
     'rest_framework',
     'rest_framework.authtoken',
     'metaxcan_api',
@@ -144,3 +145,12 @@ STATIC_URL = '/static/'
 
 MEDIA_ROOT = "uploaded_files"
 MEDIA_URL = "/uploaded_files/"
+
+#Celery
+
+BROKER_URL = 'amqp://guest:guest@localhost:5672//'
+
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+

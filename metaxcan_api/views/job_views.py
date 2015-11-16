@@ -11,6 +11,7 @@ from .utilities import AuthenticatedUserMixin, GetJobMixin
 from metaxcan_api.serializers import JobSerializer, MetaxcanParametersSerializer
 from metaxcan_api.permissions import AuthenticatedOwnerPermission
 from metaxcan_api.models import Job, JobStateEnum, MetaxcanParameters
+from metaxcan_api.tasks import run_job
 
 #http://stackoverflow.com/questions/16857450/how-to-register-users-in-django-rest-framework
 
@@ -73,6 +74,7 @@ class JobViewSet(AuthenticatedUserMixin,
             raise PermissionDenied(_("Cannot start job that is already started"))
         job.start()
         data = self.get_serializer(job).data if job else None
+        run_job.delay(pk)
         return Response(data)
 
     @detail_route(methods=['get', 'patch'])

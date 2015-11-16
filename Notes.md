@@ -30,6 +30,7 @@ $ python manage.py runserver
 
 - **SECRET KEY must be changed in production**
 - If Celery and Django are installed in different environments, theier working folder must be shared/mounted in both.
+- You must setup transcriptomes.
 
 Node And JS Garbage
 -------------------

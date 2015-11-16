@@ -153,3 +153,6 @@ CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 
+METAXCAN_SOFTWARE = "/home/heroico/Documents/Projects/Chicago/MetaXcan/working/software"
+METAXCAN_PYTHON = "/home/heroico/.pyenv/versions/2.7.6/bin/python"
+

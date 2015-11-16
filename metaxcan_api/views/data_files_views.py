@@ -44,11 +44,10 @@ class DataFileViewSet(AuthenticatedUserMixin,
         job.files.add(file)
 
     def move_file(self, job, file):
-        user = job.owner
         initial_path = file.file.path
         root = settings.MEDIA_ROOT
 
-        hierarchy = os.path.join(str(user.id), str(job.id))
+        hierarchy = job.hierarchy_input_files_path()
         path = os.path.join(root, hierarchy)
         if not os.path.exists(path):
             os.makedirs(path)

@@ -7,12 +7,12 @@
     angular.module('metaxcanClientControllers')
         .controller('HomeCtrl',
             ["$scope", "$location", "$timeout", "ngDialog",
-            "userService", "jobService", "transcriptomeService", "usSpinnerService",
+            "userService", "jobService", "configurationService", "usSpinnerService",
             "paths",
             home]);
 
     function home($scope, $location, $timeout, ngDialog,
-            userService, jobService, transcriptomeService, usSpinnerService, paths) {
+            userService, jobService, configurationService, usSpinnerService, paths) {
 
         var vm = this;
         vm.onCreateMetaxcan = onCreateMetaxcan;
@@ -41,11 +41,17 @@
             $timeout(function() {
                 usSpinnerService.spin('my_spinner');
             }, 100);
-            transcriptomeService.getTranscriptomes().then(function(result){
-                if (transcriptomeService.error) {
-                    errorHandler(transcriptomeService.error)
+            configurationService.getTranscriptomes().then(function(result){
+                if (configurationService.error) {
+                    errorHandler(configurationService.error);
                 } else {
-                    jobService.getActiveJob().then(activeJobCallback)
+                    configurationService.getCovariances().then(function(result){
+                        if (configurationService.error) {
+                            errorHandler(configurationService.error);
+                        } else {
+                            jobService.getActiveJob().then(activeJobCallback);
+                        }
+                    });
                 }
             })
         }

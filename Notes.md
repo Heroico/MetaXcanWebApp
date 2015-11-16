@@ -30,7 +30,14 @@ $ python manage.py runserver
 
 - **SECRET KEY must be changed in production**
 - If Celery and Django are installed in different environments, theier working folder must be shared/mounted in both.
-- You must setup transcriptomes.
+- You must setup transcriptomes and covariances.
+```
+$ python manage.py shell
+
+> c = Covariance(name="Whole Blood, European Reference",path="/path/to/COV_TGF_EUR")
+> c.save()
+
+```
 
 Node And JS Garbage
 -------------------

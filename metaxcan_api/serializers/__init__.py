@@ -6,3 +6,4 @@ from .job_serializers import JobSerializer
 from .transcriptome_model_database_serializers import TranscriptomeModelSerializer
 from .metaxcan_parameters_serializers import MetaxcanParametersSerializer
 from .data_file_serializers import DataFileSerializer
+from .covariance_serializer import CovarianceSerializer

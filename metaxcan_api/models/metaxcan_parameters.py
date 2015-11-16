@@ -5,10 +5,12 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.conf import settings
 from .transcriptome_model_database import TranscriptomeModelDB
+from .covariance import Covariance
 
 class MetaxcanParameters(models.Model):
     owner = models.ForeignKey(User)
     transcriptome = models.ForeignKey(TranscriptomeModelDB, null=True, blank=True, default = None)
+    covariance = models.ForeignKey(Covariance, null=True, blank=True, default = None)
     snp_column = models.CharField(max_length=50, default="SNP")
     other_allele_column = models.CharField(max_length=50, default="A1")
     effect_allele_column = models.CharField(max_length=50, default="A2")

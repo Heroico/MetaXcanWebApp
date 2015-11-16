@@ -2,7 +2,7 @@
     'use strict';
 
     /* Controllers */
-    angular.module('metaxcanClientControllers', ['metaxcanClientServices', 'angularSpinner'])
+    angular.module('metaxcanClientControllers', ['metaxcanClientServices', 'angularSpinner', "ngFileUpload"])
         .controller('NavBarCtrl', ["$scope", "userService", navBar]);
 
     function navBar($scope, userService){

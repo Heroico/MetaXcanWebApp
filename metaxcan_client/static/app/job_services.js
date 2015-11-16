@@ -1,8 +1,11 @@
 (function(){
     angular.module('metaxcanClientServices')
-        .factory('jobService', ['$rootScope', '$resource', 'userService', jobService])
+        .factory('jobService',
+        ['$rootScope', '$resource', "$timeout",
+        'userService', 'Upload',
+         jobService])
 
-    function jobService($rootScope, $resource, userService){
+    function jobService($rootScope, $resource, $timeout, userService, Upload){
         var service = {}
         service.updateToken = updateToken;
         service.updateUser = updateUser;
@@ -10,19 +13,27 @@
         service.createMetaxcanJob = createMetaxcanJob;
         service.getMetaxcanParameters = getMetaxcanParameters;
         service.updateMetaxcanParameters = updateMetaxcanParameters;
+        service.getJobFiles = getJobFiles
+        service.uploadJobFile = uploadJobFile
+        service.startJob = startJob
         service.JOB_SERVICE_READY_NOTIFICATION = "jobs:ready";
         service.JOB_SERVICE_DOWN_NOTIFICATION = "jobs:down";
-        service.ready = false;
-        service.activeJob = null;
-        service.metaxcanParameters = null;
-        service.user =null;
-        service.error = null;
 
         initialice();
 
         return service;
 
+/* Setup */
         function initialice() {
+            service.ready = false;
+            service.job = null;
+            service.metaxcanParameters = null;
+            service.user =null;
+            service.error = null;
+            service.files = [];
+            service.uploadFiles = []
+            service.failedFiles = []
+
             service.updateToken(userService.token);
             service.updateUser(userService.user);
 
@@ -66,6 +77,13 @@
             }
         }
 
+        function authorization() {
+            var a = ' Token '+service.token
+            return a;
+        }
+
+/* Metaxcan Jobs */
+
         // Returns a promise of active job. In case of error, the promise will be fillled an "{errorMessage;'some error message'}" object
         function getActiveJob() {
             var resource = $resource("api/users/:user_id/jobs/active/", {}, {
@@ -73,7 +91,7 @@
                     method:"GET",
                     isArray:false,
                     interceptor:{response:jobSuccessCallback, responseError:jobErrorCallback},
-                    headers:{'Authorization':(' Token '+service.token), 'kk':'kk'}
+                    headers:{'Authorization': authorization() }
                 },
             });
 
@@ -89,7 +107,7 @@
                     method:"POST",
                     isArray:false,
                     interceptor:{response:jobSuccessCallback, responseError:jobErrorCallback},
-                    headers:{'Authorization':(' Token '+service.token), 'kk':'kk'}
+                    headers:{'Authorization': authorization() }
                 },
             });
 
@@ -100,12 +118,12 @@
         }
 
         function jobSuccessCallback(response) {
-            job = response.data;
+            var job = response.data;
             if (job && "id" in job) {
-                service.activeJob = job;
+                service.job = job;
             }
             service.error = null;
-            return service.activeJob;
+            return service.job;
         }
 
         function jobErrorCallback(response) {
@@ -123,9 +141,49 @@
                 }
             }
             service.error = {message:message};
-            service.activeJob = null;
+            service.job = null;
             return service.error;
         }
+
+
+        function startJob(job) {
+            var resource = jobResource();
+            var p = resource
+                        .start_job({user_id: service.user.id, job_id:job.id}, {})
+                        .$promise
+            return p;
+        }
+
+        function jobResource() {
+            var resource = $resource("api/users/:user_id/jobs/:job_id/", {}, {
+                get_metaxcan_parameters: {
+                    url:"api/users/:user_id/jobs/:job_id/metaxcan_parameters/",
+                    method:"GET",
+                    interceptor:{response: metaxcanParametersSuccessCallback, responseError:metaxcanErrorCallback},
+                    headers:{'Authorization': authorization() }
+                },
+                patch_metaxcan_parameters:{
+                    url:"api/users/:user_id/jobs/:job_id/metaxcan_parameters/",
+                    method:"PATCH",
+                    interceptor:{response: metaxcanParametersSuccessCallback, responseError:metaxcanErrorCallback},
+                    headers:{'Authorization': authorization() }
+                },
+                start_job:{
+                    url:"api/users/:user_id/jobs/:job_id/start/",
+                    method:"POST",
+                    interceptor:{response: jobSuccessCallback, responseError:jobStartErrorCallback},
+                    headers:{'Authorization': authorization() }
+                },
+            });
+            return resource;
+        }
+
+        function jobStartErrorCallback(response) {
+            message = "Something went wrong when starting the Job";
+            return handleError(message, response);
+        }
+
+/* Metaxcan parameters */
 
         function getMetaxcanParameters(job) {
             var resource = jobResource();
@@ -135,28 +193,12 @@
             return p;
         }
 
-        function updateMetaxcanParameters(parameters) {
+        function updateMetaxcanParameters(job, parameters) {
             var resource = jobResource();
             var p = resource
                         .patch_metaxcan_parameters({user_id: service.user.id, job_id:job.id}, parameters)
                         .$promise
             return p;
-        }
-
-        function jobResource() {
-            var resource = $resource("api/users/:user_id/jobs/:job_id/metaxcan_parameters/", {}, {
-                get_metaxcan_parameters: {
-                    method:"GET",
-                    interceptor:{response: metaxcanParametersSuccessCallback, responseError:metaxcanErrorCallback},
-                    headers:{'Authorization':(' Token '+service.token), 'kk':'kk'}
-                },
-                patch_metaxcan_parameters:{
-                    method:"PATCH",
-                    interceptor:{response: metaxcanParametersSuccessCallback, responseError:metaxcanErrorCallback},
-                    headers:{'Authorization':(' Token '+service.token), 'kk':'kk'}
-                }
-            });
-            return resource;
         }
 
         function metaxcanParametersSuccessCallback(response) {
@@ -174,8 +216,105 @@
 
         function metaxcanErrorCallback(response) {
             message = "Something went wrong with the metaxcan parameters";
+            return handleError(message, response);
+        }
+
+/* Files */
+        function getJobFiles(job) {
+            var resource = filesResource();
+            var p = resource.get_files({user_id:service.user.id, job_id:job.id}).$promise;
+            return p;
+        }
+
+        function filesResource() {
+                var resource = $resource("api/users/:user_id/jobs/:job_id/files/", {}, {
+                get_files: {
+                    method:"GET",
+                    isArray:true,
+                    interceptor:{response: filesSuccessCallback, responseError:filesErrorCallback},
+                    headers:{'Authorization': authorization() }
+                }
+            });
+            return resource;
+        }
+
+        function filesSuccessCallback(response) {
+            service.error = null
+            service.files = response.data;
+            return service.files;
+        }
+
+        function filesErrorCallback(response) {
+            message = "Something went wrong with the job files";
             console.log(JSON.stringify(response));
             return handleError(message, response);
+        }
+
+        /* Expects a file as returned by AngularFileUpload. Can accept a progress callback */
+        //http://stackoverflow.com/questions/20473572/django-rest-framework-file-upload
+        function uploadJobFile(f) {
+            console.log("Upload")
+            // Seems that angular file upload gets called multiple times.
+            if (!checkDupFile(f)) {
+                console.log("Dup")
+                return null;
+            }
+
+            path = buildJobFilesPath();
+            f.upload = Upload.upload( {
+                url: path,
+                data: {name: f.name, file:f},
+                headers: {'Authorization': authorization()},
+            });
+
+            service.uploadFiles.push(f);
+
+            var p = f.upload.then(function (response) {
+                service.files.push(response.data);
+                service.uploadFiles = _.reject(service.uploadFiles, function(el){ return el.name === f.name; } );
+                return response;
+            }, function (response) {
+                var message = "Error:"+response.status
+                var error = response.data;
+                if (error && typeof error === "object" && "detail" in error ) {
+                    message = message + ":" + error.detail;
+                } else if (error && typeof error === "object" && "file" in error ) {
+                    message = message + ":" + error.file;
+                } else if (error) {
+                    message = message + ":" + JSON.stringify(error)
+                }
+                f.error = message;
+                service.failedFiles.push(f);
+                service.uploadFiles = _.reject(service.uploadFiles, function(el){ return el.name === f.name; } );
+                return response;
+            }, function (evt) {
+                f.progress = Math.min(100, parseInt(100.0 * evt.loaded / evt.total));
+                return evt
+            });
+
+            return p;
+        }
+
+        function checkDupFile(f) {
+            var found = _.find(service.files, function(el){ return el.name === f.name; })
+            if (found) return false;
+
+            found = _.find(service.uploadFiles, function(el){ return el.name === f.name; })
+            if (found) return false;
+
+            found = _.find(service.failedFiles, function(el){ return el.name === f.name; })
+            if (found) return false;
+
+            return true
+        }
+
+        function buildJobFilesPath() {
+            path = "api/users/"+
+                service.user.id +
+                "/jobs/"+
+                service.job.id+
+                "/files/";
+            return path;
         }
     }
 

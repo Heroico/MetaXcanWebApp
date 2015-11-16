@@ -3,7 +3,9 @@ __author__ = 'heroico'
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
+from django.utils.translation import ugettext_lazy as _
 from .metaxcan_parameters import MetaxcanParameters
+from .data_file import DataFile
 
 class JobStateEnum(object):
     CREATED="created"
@@ -21,6 +23,8 @@ class Job(models.Model):
 
     metaxcan_parameters = models.OneToOneField(MetaxcanParameters, blank=True, null=True, default=None)
 
+    files = models.ManyToManyField(DataFile)
+
     def __str__(self):
         t = self.title if self.title else "Untitled Job"
         c = str(self.created_date)
@@ -28,8 +32,14 @@ class Job(models.Model):
 
     @classmethod
     def active_job(cls, owner):
-        results = Job.objects.filter(state="created", owner=owner)
+        results = Job.objects.filter(state__in=[JobStateEnum.CREATED, JobStateEnum.RUNNING], owner=owner)
         if results.count() > 0:
             return results[0]
 
         return None
+
+    def start(self):
+        if self.state != JobStateEnum.CREATED:
+            raise Exception(_("Can't start that which already is started"))
+        self.state = JobStateEnum.RUNNING
+        self.save()

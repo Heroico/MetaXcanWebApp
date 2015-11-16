@@ -1,20 +1,22 @@
 __author__ = 'heroico'
 
-import copy
+from django.utils.translation import ugettext_lazy as _
 from rest_framework import status
 from rest_framework.settings import api_settings
 from rest_framework.exceptions import PermissionDenied, NotAuthenticated, NotFound, ParseError
 from rest_framework.response import Response
 from rest_framework.viewsets import ReadOnlyModelViewSet
 from rest_framework.decorators import list_route, detail_route
-from django.contrib.auth.models import User
+from .utilities import AuthenticatedUserMixin, GetJobMixin
 from metaxcan_api.serializers import JobSerializer, MetaxcanParametersSerializer
 from metaxcan_api.permissions import AuthenticatedOwnerPermission
-from metaxcan_api.models import Job, MetaxcanParameters
+from metaxcan_api.models import Job, JobStateEnum, MetaxcanParameters
 
 #http://stackoverflow.com/questions/16857450/how-to-register-users-in-django-rest-framework
 
-class JobViewSet(ReadOnlyModelViewSet):
+class JobViewSet(AuthenticatedUserMixin,
+                 GetJobMixin,
+                 ReadOnlyModelViewSet):
     serializer_class = JobSerializer
     permission_classes = (AuthenticatedOwnerPermission, )
 
@@ -59,31 +61,23 @@ class JobViewSet(ReadOnlyModelViewSet):
         headers = self.get_success_headers(serializer.data)
         return job, headers
 
-    def get_authenticated_user(self):
-        if not self.request.user.is_authenticated():
-            raise NotAuthenticated
-        user_id = self.kwargs['user_pk']
-        candidates = User.objects.filter(id=user_id).filter(id=self.request.user.id)
-        if candidates.count() != 1:
-            raise PermissionDenied
-        else:
-            user = candidates[0]
-        return user
-
     def get_metaxcan_parameters_serializer(self, *args, **kwargs):
         kwargs['context'] = self.get_serializer_context()
         metaxcan_parameters_serializer = MetaxcanParametersSerializer(*args, **kwargs)
         return metaxcan_parameters_serializer
 
+    @detail_route(methods=['post'])
+    def start(self, request, user_pk, pk=None, *args, **kwargs):
+        job = self.get_job(pk)
+        if job.state != JobStateEnum.CREATED:
+            raise PermissionDenied(_("Cannot start job that is already started"))
+        job.start()
+        data = self.get_serializer(job).data if job else None
+        return Response(data)
+
     @detail_route(methods=['get', 'patch'])
     def metaxcan_parameters(self, request, user_pk, pk=None, *args, **kwargs):
-        user = self.get_authenticated_user()
-        jobs = Job.objects.filter(id=pk)
-        job = jobs[0] if jobs.count() == 1 else None
-        if not job:
-            raise NotFound
-        if job.owner != user:
-            raise PermissionDenied
+        job = self.get_job(pk)
 
         metaxcan_parameters = job.metaxcan_parameters
         if not metaxcan_parameters:

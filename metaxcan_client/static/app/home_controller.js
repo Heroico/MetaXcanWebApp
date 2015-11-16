@@ -18,7 +18,7 @@
         vm.onCreateMetaxcan = onCreateMetaxcan;
         vm.loggedin = userService.loggedin();
         vm.user = userService.user;
-        vm.activeJob = null;
+        vm.job = null;
         vm.error = null;
 
         initialise();
@@ -50,11 +50,14 @@
             })
         }
 
-        function activeJobCallback(result) {
+        function errorHandler(error) {
+            vm.message = error.message;
             $timeout(function() {
                 usSpinnerService.stop('my_spinner');
             }, 100);
+        }
 
+        function activeJobCallback(result) {
             if (result && "message" in result) {
                 errorHandler(result);
             } else {
@@ -63,33 +66,39 @@
         }
 
         function activeJobUpdated(activeJob) {
-            vm.activeJob = activeJob;
+            vm.job = activeJob;
             if (activeJob) {
                 $timeout(function() { usSpinnerService.spin('my_spinner');}, 100);
                 vm.message = "Found active job, refreshing";
-                jobService.getMetaxcanParameters(jobService.activeJob).then(metaxcanParametersCallback);
+                jobService.getMetaxcanParameters(jobService.job).then(metaxcanParametersCallback);
+            } else {
+                $timeout(function() { usSpinnerService.stop('my_spinner');}, 100);
             }
-        }
-
-        function errorHandler(error) {
-            vm.message = error.message;
         }
 
         function metaxcanParametersCallback(result) {
-            $timeout(function() { usSpinnerService.stop('my_spinner'); }, 100);
             if (result && "message" in result) {
                 errorHandler(result);
             } else {
-                metaxcanParametersUpdated(result);
+                jobService.getJobFiles(jobService.job).then(jobFilesCallback)
             }
         }
 
-        function metaxcanParametersUpdated(parameters) {
-             vm.message = "Refreshed parameters, redirecting";
-             $location.path(paths.metaxcan_job_path);
+        function jobFilesCallback(result) {
+            if (result && typeof result === "object" && "message" in result) {
+                errorHandler(result);
+            } else {
+                refreshComplete();
+            }
         }
 
-/* */
+        function refreshComplete() {
+            $timeout(function() { usSpinnerService.stop('my_spinner');}, 100);
+            vm.message = "Refreshed parameters, redirecting";
+            $location.path(paths.metaxcan_job_path);
+        }
+
+/* Create Metaxcan job event */
         function onCreateMetaxcan() {
             var dialog = ngDialog.open({
                 template: 'static/app/dialogs/new_metaxcan_dialog.html',

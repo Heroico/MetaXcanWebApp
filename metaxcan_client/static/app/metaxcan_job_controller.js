@@ -3,26 +3,31 @@
 
     /* Controllers */
     angular.module('metaxcanClientControllers')
-        .controller('MetaxcanJobCtrl', ["$scope", "$location", "usSpinnerService",
+        .controller('MetaxcanJobCtrl', ["$scope", "$location", "$timeout", "usSpinnerService", "Upload",
             "jobService", "transcriptomeService", "paths",
             metaxcanJobController]);
 
-    function metaxcanJobController($scope, $location, usSpinnerService,
+    function metaxcanJobController($scope, $location, $timeout, usSpinnerService, Upload,
                 jobService, transcriptomeService, paths){
         var vm = this;
-        vm.job = jobService.activeJob;
         vm.parameters =  {};
         vm.message = null;
         vm.transcriptomes = null;
+        vm.uploadFiles = uploadFiles
+        vm.jobService = jobService
 
         vm.start = start
 
         initialise();
 
         function initialise() {
-            if (jobService.activeJob == null) {
+            if (jobService.job == null) {
                 $location.path(paths.home);
                 return
+            }
+
+            if (jobService.job.state == "running") {
+                $timeout(function() { usSpinnerService.spin('mp_spinner');}, 100); //workaround to spinner race condition
             }
 
             vm.transcriptomes = transcriptomeService.transcriptomes;
@@ -32,7 +37,7 @@
         function start() {
             usSpinnerService.spin('mp_spinner');
             vm.message = "Updating parameters";
-            jobService.updateMetaxcanParameters(vm.parameters).then(updateParametersCallback);
+            jobService.updateMetaxcanParameters(vm.jobService.job, vm.parameters).then(updateParametersCallback);
         }
 
         function updateParametersCallback(result) {
@@ -45,7 +50,7 @@
             }
         }
 
-       function errorHandler(error) {
+        function errorHandler(error) {
             vm.message = error.message;
         }
 
@@ -60,7 +65,21 @@
         }
 
         function doStart() {
-            alert("howdy");
+            jobService.startJob(jobService.job).then(function(result){
+                if (! jobService.error ) {
+                    usSpinnerService.spin('mp_spinner'); //workaround to spinner race condition
+                } else {
+                    vm.message = jobService.error.message;
+                }
+            });
+        }
+
+/* */
+
+        function uploadFiles(files, errFiles) {
+            angular.forEach(files, function(file) {
+                jobService.uploadJobFile(file)
+            });
         }
     };
 

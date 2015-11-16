@@ -1,11 +1,14 @@
-<form class="form" role="form" ng-submit="vm.start()">
+<form class="form" role="form">
   <div class="row">
     <div class="col-md-3"></div>
     <div class="col-md-6 center-component">
       <h2 class="form-heading">Metaxcan Job:{{(vm.job.title && vm.job.title.length) ? vm.job.title : "Untitled job"}}</h2>
-      <span us-spinner="{radius:10, width:4, length: 8}" spinner-key="mp_spinner"></span>
+      <div ng-if="vm.jobService.job.state != 'created'">Job Status: {{vm.jobService.job.state}}</div>
     </div>
+    <div><span us-spinner="{radius:10, width:4, length: 8}" spinner-key="mp_spinner"></span></div>
   </div>
+  <fieldset ng-disabled="vm.jobService.job.state != 'created'">
+  <!-- unindented for laziness-->
   <div class="row">
     <div class="col-md-3"></div>
     <div class="col-md-2">
@@ -53,24 +56,61 @@
   <div class="row">
     <div class="col-md-4"></div>
     <div class="col-md-1 center-component">
-      Transcriptome Model
+      <div>Transcriptome Model</div>
     </div>
     <div class="col-md-3 center-component">
       <select ng-model="vm.parameters.transcriptome" convert-to-number class="form-control" id="transcriptomeSelect">
         <option ng-repeat="t in vm.transcriptomes" value="{{t.id}}">{{t.name}}</option>
       </select>
+      <div class="left-to-center">
+        <input type="checkbox"  ng-model="vm.parameters.compressed"> Files Are GZipped Compressed
+      </div>
+      <div class="form-control-wrapper">
+        <input ng-model="vm.parameters.separator" type="text" class="form-control" id="separator">
+        <div class="floating-label">Separator character</div>
+        <span class="material-input"></span>
+      </div>
     </div>
   </div>
   <div class="row">
     <div class="col-md-4"></div>
     <div class="col-md-4 center-component">
-      <button class="btn btn-lg btn-primary btn-block" type="submit">Start</button>
+      <button type="file" class="btn btn-primary" ngf-select="vm.uploadFiles($files, $invalidFiles)" ngf-multiple="true" ngf-pattern=".txt,.gz">
+        Select Files
+      </button>
+      <ul>
+        <li ng-repeat="f in vm.jobService.uploadFiles" style="font:smaller">{{f.name}} {{f.error}}
+          <span class="progress" ng-show="f.progress >= 0">
+            <div style="width:{{f.progress}}%" ng-bind="f.progress + '%'"></div>
+          </span>
+        </li>
+        <li ng-repeat="f in vm.jobService.failedFiles" style="font:smaller">{{f.name}} {{f.error}} {{f.$error}} {{f.$errorParam}}
+        </li>
+        <li ng-repeat="f in vm.jobService.files" style="font:smaller">{{f.name}}
+        </li>
+      </ul>
     </div>
   </div>
+  <div class="row">
+    <div class="col-md-4"></div>
+    <div class="col-md-4 center-component">
+      <button class="btn btn-lg btn-primary btn-block" ng-click="vm.start()">Start</button>
+    </div>
+  </div>
+  <!-- unindented for laziness -->
+  </fieldset>
   {{vm.message}}
   <style>
     .form-control-wrapper {
       margin: 18px 0;
+    }
+    .center-component {
+      padding: 15px 10px 15px 10px;
+    }
+    .left-to-center {
+      margin: 15px 0px 15px 0px;
+      padding: 15px 0px 15px 0px;
+      text-align: left;
     }
   </style>
 </form>

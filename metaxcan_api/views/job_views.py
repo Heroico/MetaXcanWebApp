@@ -73,8 +73,8 @@ class JobViewSet(AuthenticatedUserMixin,
         if job.state != JobStateEnum.CREATED:
             raise PermissionDenied(_("Cannot start job that is already started"))
         job.start()
-        data = self.get_serializer(job).data if job else None
         run_job.delay(pk)
+        data = self.get_serializer(job).data if job else None
         return Response(data)
 
     @detail_route(methods=['get', 'patch'])

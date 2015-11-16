@@ -20,12 +20,6 @@ $ pip install -e git+git://github.com/alanjds/drf-nested-routers@master#egg=drf-
 
 There is a requirements file, but it has some extra stuff that might not be needed.
 
-You may need to setup Celery connection to Django ORM. (Though I suspect it is not strictly necessary)
-
-```bash
-$ python manage.py migrate djcelery
-```
-
 To run stuff in dev environment:
 ```bash
 $ sudo rabbitmq-server -detached
@@ -34,7 +28,8 @@ $ python manage.py runserver
 ```
 
 
-**SECRET KEY must be changed in production**
+- **SECRET KEY must be changed in production**
+- If Celery and Django are installed in different environments, theier working folder must be shared/mounted in both.
 
 Node And JS Garbage
 -------------------
@@ -74,4 +69,10 @@ And run with:
 ```bash
 $ sudo rabbitmq-server -detached
 $ sudo rabbitmqctl stop
+```
+You **might** want to setup Celery connection to Django ORM, instead of rabbit.
+Yopu will need to change some config in django.
+```bash
+# only for django ORM as Celery transport layer.
+$ python manage.py migrate djcelery
 ```

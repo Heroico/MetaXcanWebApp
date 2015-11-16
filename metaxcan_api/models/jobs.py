@@ -43,3 +43,9 @@ class Job(models.Model):
             raise Exception(_("Can't start that which already is started"))
         self.state = JobStateEnum.RUNNING
         self.save()
+
+    def complete(self):
+        if self.state != JobStateEnum.RUNNING:
+            raise Exception(_("Can't complete that which is not running"))
+        self.state = JobStateEnum.COMPLETED
+        self.save()

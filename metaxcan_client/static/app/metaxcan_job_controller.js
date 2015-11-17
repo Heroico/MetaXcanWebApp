@@ -3,18 +3,22 @@
 
     /* Controllers */
     angular.module('metaxcanClientControllers')
-        .controller('MetaxcanJobCtrl', ["$scope", "$location", "$timeout", "usSpinnerService", "Upload",
-            "jobService", "transcriptomeService", "paths",
+        .controller('MetaxcanJobCtrl', ["$scope", "$location", "$timeout", "$http",
+            "usSpinnerService", "Upload",
+            "jobService", "configurationService", "paths",
             metaxcanJobController]);
 
-    function metaxcanJobController($scope, $location, $timeout, usSpinnerService, Upload,
-                jobService, transcriptomeService, paths){
+    function metaxcanJobController($scope, $location, $timeout, $http,
+                usSpinnerService, Upload,
+                jobService, configurationService, paths){
         var vm = this;
         vm.parameters =  {};
         vm.message = null;
         vm.transcriptomes = null;
+        vm.covariances = null;
         vm.uploadFiles = uploadFiles
         vm.jobService = jobService
+        vm.onDownloadResults = onDownloadResults
 
         vm.start = start
 
@@ -30,7 +34,8 @@
                 $timeout(function() { usSpinnerService.spin('mp_spinner');}, 100); //workaround to spinner race condition
             }
 
-            vm.transcriptomes = transcriptomeService.transcriptomes;
+            vm.transcriptomes = configurationService.transcriptomes;
+            vm.covariances = configurationService.covariances;
             parametersUpdated(jobService.metaxcanParameters);
         }
 
@@ -62,16 +67,43 @@
                 var t = vm.transcriptomes[0];
                 vm.parameters.transcriptome = t.id;
              }
+
+             if (vm.parameters.covariance == null) {
+                var c = vm.covariances[0];
+                vm.parameters.covariance = c.id;
+             }
+
+             if (jobService.job.state == "running") {
+                monitorJobState();
+             }
         }
 
         function doStart() {
             jobService.startJob(jobService.job).then(function(result){
                 if (! jobService.error ) {
-                    usSpinnerService.spin('mp_spinner'); //workaround to spinner race condition
+                    monitorJobState();
                 } else {
                     vm.message = jobService.error.message;
                 }
             });
+        }
+
+        function monitorJobState() {
+            usSpinnerService.spin('mp_spinner');
+            $timeout( function(){
+                jobService.getJob(jobService.job.id).then(function(result) {
+                    usSpinnerService.stop('mp_spinner');
+                    if (result && "message" in result) {
+                        vm.message = "Something went wrong, retrying";
+                        monitorJobState();
+                    } else {
+                        vm.message == null;
+                        if (jobService.job.state == "running") {
+                            monitorJobState();
+                        }
+                    }
+                });
+            }, 10000);
         }
 
 /* */
@@ -80,6 +112,23 @@
             angular.forEach(files, function(file) {
                 jobService.uploadJobFile(file)
             });
+        }
+
+/* */
+        function onDownloadResults() {
+            var url = "api/users/"+jobService.user.id+"/jobs/"+jobService.job.id+"/results/"
+            $http({method:'GET',
+                    url:url,
+                    headers:{Authorization:(' Token '+jobService.token)},
+                    responseType: 'blob',
+                    })
+                .then(function success(response){
+                    vm.message = null;
+                    var data = response.data;
+                    saveAs(data, "results.zip");
+                }, function error(response){
+                    vm.message = "Something went wrong with the download";
+                });
         }
     };
 

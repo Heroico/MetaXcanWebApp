@@ -1,16 +1,22 @@
 __author__ = 'heroico'
 
+import os
+from django.core.servers.basehttp import FileWrapper
+from django.http import HttpResponse
 from django.utils.translation import ugettext_lazy as _
+from django.conf import settings
 from rest_framework import status
 from rest_framework.settings import api_settings
 from rest_framework.exceptions import PermissionDenied, NotAuthenticated, NotFound, ParseError
 from rest_framework.response import Response
 from rest_framework.viewsets import ReadOnlyModelViewSet
 from rest_framework.decorators import list_route, detail_route
+from rest_framework.pagination import LimitOffsetPagination
 from .utilities import AuthenticatedUserMixin, GetJobMixin
 from metaxcan_api.serializers import JobSerializer, MetaxcanParametersSerializer
 from metaxcan_api.permissions import AuthenticatedOwnerPermission
 from metaxcan_api.models import Job, JobStateEnum, MetaxcanParameters
+from metaxcan_api.tasks import run_metaxcan_job
 
 #http://stackoverflow.com/questions/16857450/how-to-register-users-in-django-rest-framework
 
@@ -19,6 +25,7 @@ class JobViewSet(AuthenticatedUserMixin,
                  ReadOnlyModelViewSet):
     serializer_class = JobSerializer
     permission_classes = (AuthenticatedOwnerPermission, )
+    pagination_class = LimitOffsetPagination
 
     def get_queryset(self):
         user = self.get_authenticated_user()
@@ -69,14 +76,34 @@ class JobViewSet(AuthenticatedUserMixin,
     @detail_route(methods=['post'])
     def start(self, request, user_pk, pk=None, *args, **kwargs):
         job = self.get_job(pk)
-        if job.state != JobStateEnum.CREATED:
-            raise PermissionDenied(_("Cannot start job that is already started"))
+        if job.state not in [JobStateEnum.CREATED, JobStateEnum.FAILED]:
+            raise PermissionDenied(_("Cannot start job"))
         job.start()
+        if job.metaxcan_parameters and job.metaxcan_parameters.id:
+            run_metaxcan_job.delay(pk)
+        else:
+            raise PermissionDenied(_("Need parameters"))
         data = self.get_serializer(job).data if job else None
         return Response(data)
 
+    @detail_route(methods=['get'])
+    def results(self, request, user_pk, pk=None, *args, **kwargs):
+        user = self.get_authenticated_user()
+        job = self.get_job(pk)
+        if not job.state == JobStateEnum.COMPLETED:
+            raise PermissionDenied(_("Job not completed"))
+        path = job.hierarchy_results_path() + ".zip"
+        path = os.path.join(settings.MEDIA_ROOT, path)
+        if not os.path.exists(path):
+            raise PermissionDenied("Job Results lost")
+        with open(path, 'rb') as file:
+            response = HttpResponse(FileWrapper(file), content_type='application/zip')
+            response['Content-Disposition'] = 'attachment; filename="%s"' % 'results.zip'
+            return response
+
     @detail_route(methods=['get', 'patch'])
     def metaxcan_parameters(self, request, user_pk, pk=None, *args, **kwargs):
+        user = self.get_authenticated_user()
         job = self.get_job(pk)
 
         metaxcan_parameters = job.metaxcan_parameters

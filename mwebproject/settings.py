@@ -37,7 +37,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    "compressor",
+    'compressor',
     'rest_framework',
     'rest_framework.authtoken',
     'metaxcan_api',
@@ -91,7 +91,7 @@ DATABASES = {
     }
 }
 
-
+# REST FRAMEWORK
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
@@ -144,3 +144,15 @@ STATIC_URL = '/static/'
 
 MEDIA_ROOT = "uploaded_files"
 MEDIA_URL = "/uploaded_files/"
+
+#Celery
+
+BROKER_URL = 'amqp://guest:guest@localhost:5672//'
+
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+
+METAXCAN_SOFTWARE = "/home/heroico/Documents/Projects/Chicago/MetaXcan/working/software"
+METAXCAN_PYTHON = "/home/heroico/.pyenv/versions/2.7.6/bin/python"
+

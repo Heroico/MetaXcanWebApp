@@ -12,6 +12,14 @@
           New Metaxcan Process
         </button>
       </div>
+      <div ng-if="vm.jobs && vm.jobs.length">
+        Previous jobs:
+        <ul>
+          <li ng-repeat="j in vm.jobs" style="font:smaller">
+            <div align="left" class="btn btn-default btn-job" ng-click="vm.onSelectJob(j)">{{j.title}}, {{ j.created_date | date : format : timezone}}</div>
+          </li>
+        </ul>
+      </div>
       <p>{{ vm.message ? vm.message : "" }}</p>
     </div>
   </div>
@@ -24,3 +32,15 @@
     </div>
   </div>
 </div>
+
+<style>
+  li{
+    text-align: left;
+    margin:2px 0px 0px 0px;
+  }
+ .btn-job {
+    text-align: left;
+    text-transform: none;
+    margin: 0px 1px 4px 0px;
+  }
+</style>

@@ -7,19 +7,22 @@
     angular.module('metaxcanClientControllers')
         .controller('HomeCtrl',
             ["$scope", "$location", "$timeout", "ngDialog",
-            "userService", "jobService", "transcriptomeService", "usSpinnerService",
+            "userService", "jobService", "configurationService", "usSpinnerService",
             "paths",
             home]);
 
     function home($scope, $location, $timeout, ngDialog,
-            userService, jobService, transcriptomeService, usSpinnerService, paths) {
+            userService, jobService, configurationService, usSpinnerService, paths) {
 
         var vm = this;
+        vm.onSelectJob = onSelectJob
         vm.onCreateMetaxcan = onCreateMetaxcan;
         vm.loggedin = userService.loggedin();
         vm.user = userService.user;
         vm.job = null;
         vm.error = null;
+        vm.jobs = null;
+        vm.offset = 0;
 
         initialise();
 
@@ -41,11 +44,17 @@
             $timeout(function() {
                 usSpinnerService.spin('my_spinner');
             }, 100);
-            transcriptomeService.getTranscriptomes().then(function(result){
-                if (transcriptomeService.error) {
-                    errorHandler(transcriptomeService.error)
+            configurationService.getTranscriptomes().then(function(result){
+                if (configurationService.error) {
+                    errorHandler(configurationService.error);
                 } else {
-                    jobService.getActiveJob().then(activeJobCallback)
+                    configurationService.getCovariances().then(function(result){
+                        if (configurationService.error) {
+                            errorHandler(configurationService.error);
+                        } else {
+                            jobService.getActiveJob().then(jobCallback);
+                        }
+                    });
                 }
             })
         }
@@ -57,30 +66,40 @@
             }, 100);
         }
 
-        function activeJobCallback(result) {
+        function jobCallback(result) {
             if (result && "message" in result) {
                 errorHandler(result);
             } else {
-                activeJobUpdated(result);
+                jobUpdated(result);
             }
         }
 
-        function activeJobUpdated(activeJob) {
+        function jobUpdated(activeJob) {
             vm.job = activeJob;
             if (activeJob) {
                 $timeout(function() { usSpinnerService.spin('my_spinner');}, 100);
                 vm.message = "Found active job, refreshing";
-                jobService.getMetaxcanParameters(jobService.job).then(metaxcanParametersCallback);
+                jobService.getMetaxcanParameters(vm.job).then(metaxcanParametersCallback);
             } else {
+                if (vm.jobs != null) {
+                    return;
+                }
                 $timeout(function() { usSpinnerService.stop('my_spinner');}, 100);
+                jobService.getJobs(vm.offset, 10).then(function(results){
+                    if (results && "message" in results) {
+                        errorHandler(results)
+                    } else {
+                        vm.jobs = results;
+                    }
+                });
             }
         }
 
         function metaxcanParametersCallback(result) {
-            if (result && "message" in result) {
+            if (result && !(result instanceof Array) && "message" in result) {
                 errorHandler(result);
             } else {
-                jobService.getJobFiles(jobService.job).then(jobFilesCallback)
+                jobService.getJobFiles(vm.job).then(jobFilesCallback)
             }
         }
 
@@ -132,9 +151,19 @@
             }
 
             usSpinnerService.spin('my_spinner');
-            jobService.createMetaxcanJob(value).then(activeJobCallback)
+            jobService.createMetaxcanJob(value).then(jobCallback)
         }
 
+/* Select old job */
+        function onSelectJob(j) {
+            jobService.getJob(j.id).then(function(result){
+                if (result && "message" in result) {
+                    vm.message = "Error getting job";
+                } else {
+                    jobUpdated(result);
+                }
+            });
+        }
     };
 
 })();

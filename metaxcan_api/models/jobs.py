@@ -1,5 +1,6 @@
 __author__ = 'heroico'
 
+import os
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
@@ -12,8 +13,9 @@ class JobStateEnum(object):
     RUNNING="running"
     COMPLETED="completed"
     CANCELLED="cancelled"
+    FAILED="failed"
 
-    options=[CREATED, RUNNING, COMPLETED, CANCELLED]
+    options=[CREATED, RUNNING, COMPLETED, CANCELLED, FAILED]
 
 class Job(models.Model):
     owner = models.ForeignKey(User)
@@ -32,14 +34,49 @@ class Job(models.Model):
 
     @classmethod
     def active_job(cls, owner):
-        results = Job.objects.filter(state__in=[JobStateEnum.CREATED, JobStateEnum.RUNNING], owner=owner)
+        results = Job.objects.filter(
+            state__in=[JobStateEnum.CREATED, JobStateEnum.RUNNING, JobStateEnum.FAILED],
+            owner=owner)
         if results.count() > 0:
             return results[0]
 
         return None
 
+# crude state machine
     def start(self):
-        if self.state != JobStateEnum.CREATED:
+        if self.state not in [JobStateEnum.CREATED, JobStateEnum.FAILED]:
             raise Exception(_("Can't start that which already is started"))
         self.state = JobStateEnum.RUNNING
         self.save()
+
+    def completed(self):
+        if self.state != JobStateEnum.RUNNING:
+            raise Exception(_("Can't complete that which is not running"))
+        self.state = JobStateEnum.COMPLETED
+        self.save()
+
+    def failed(self):
+        if self.state != JobStateEnum.RUNNING:
+            raise Exception(_("Can't fail that which is not running"))
+        self.state = JobStateEnum.FAILED
+        self.save()
+
+#relevant paths
+    def hierarchy_path(self):
+        user = self.owner
+        hierarchy = os.path.join(str(user.id), str(self.id))
+        return hierarchy
+
+    def hierarchy_input_files_path(self):
+        return  self.make_subpath("input_files")
+
+    def hierarchy_results_path(self):
+        return self.make_subpath("results")
+
+    def hierarchy_intermediate_path(self):
+        return self.make_subpath("intermediate")
+
+    def make_subpath(self, sub_path):
+        path = self.hierarchy_path()
+        path = os.path.join(path, sub_path)
+        return path

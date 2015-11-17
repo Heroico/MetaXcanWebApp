@@ -1,13 +1,22 @@
 <form class="form" role="form">
+  <div ng-if="vm.jobService.job.state == 'completed'">
+    <div class="row">
+      <div class="col-md-5"></div>
+      <div class="col-md-2">
+        <button class="btn btn-primary btn-default" ng-click="vm.onDownloadResults()">Download Results</button>
+      </div>
+    </div>
+  </div>
   <div class="row">
     <div class="col-md-3"></div>
     <div class="col-md-6 center-component">
-      <h2 class="form-heading">Metaxcan Job:{{(vm.job.title && vm.job.title.length) ? vm.job.title : "Untitled job"}}</h2>
+      <h2 class="form-heading">Metaxcan Job:{{(vm.jobService.job.title && vm.jobService.job.title.length > 0) ? vm.jobService.job.title : "Untitled job"}}</h2>
       <div ng-if="vm.jobService.job.state != 'created'">Job Status: {{vm.jobService.job.state}}</div>
+      <div ng-if="vm.jobService.job.state == 'failed'">Please check your settings and run again.</div>
     </div>
     <div><span us-spinner="{radius:10, width:4, length: 8}" spinner-key="mp_spinner"></span></div>
   </div>
-  <fieldset ng-disabled="vm.jobService.job.state != 'created'">
+  <fieldset ng-disabled="vm.jobService.job.state != 'created' && vm.jobService.job.state != 'failed'">
   <!-- unindented for laziness-->
   <div class="row">
     <div class="col-md-3"></div>
@@ -56,12 +65,20 @@
   <div class="row">
     <div class="col-md-4"></div>
     <div class="col-md-1 center-component">
-      <div>Transcriptome Model</div>
+      <div class="form-control-wrapper">Transcriptome Model</div>
+      <div class="form-control-wrapper">Covariance</div>
     </div>
     <div class="col-md-3 center-component">
-      <select ng-model="vm.parameters.transcriptome" convert-to-number class="form-control" id="transcriptomeSelect">
-        <option ng-repeat="t in vm.transcriptomes" value="{{t.id}}">{{t.name}}</option>
-      </select>
+      <div class="form-control-wrapper">
+        <select ng-model="vm.parameters.transcriptome" convert-to-number class="form-control" id="transcriptomeSelect">
+          <option ng-repeat="t in vm.transcriptomes" value="{{t.id}}">{{t.name}}</option>
+        </select>
+      </div>
+      <div class="form-control-wrapper">
+        <select ng-model="vm.parameters.covariance" convert-to-number class="form-control" id="covarianceSelect">
+          <option ng-repeat="c in vm.covariances" value="{{c.id}}">{{c.name}}</option>
+        </select>
+      </div>
       <div class="left-to-center">
         <input type="checkbox"  ng-model="vm.parameters.compressed"> Files Are GZipped Compressed
       </div>
@@ -84,9 +101,11 @@
             <div style="width:{{f.progress}}%" ng-bind="f.progress + '%'"></div>
           </span>
         </li>
-        <li ng-repeat="f in vm.jobService.failedFiles" style="font:smaller">{{f.name}} {{f.error}} {{f.$error}} {{f.$errorParam}}
+        <li ng-repeat="f in vm.jobService.failedFiles" style="font:smaller">
+          {{f.name}} {{f.error}} {{f.$error}} {{f.$errorParam}}
         </li>
-        <li ng-repeat="f in vm.jobService.files" style="font:smaller">{{f.name}}
+        <li ng-repeat="f in vm.jobService.files" style="font:smaller">
+          {{f.name}}
         </li>
       </ul>
     </div>

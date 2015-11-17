@@ -1,17 +1,19 @@
 (function(){
     angular.module('metaxcanClientServices')
-        .factory('transcriptomeService', ['$rootScope', '$resource',
+        .factory('configurationService',
+            ['$rootScope', '$resource',
             'userService',
-            transcriptomeService])
+            configurationService])
 
-    function transcriptomeService($rootScope, $resource,
-            userService){
+    function configurationService(
+                $rootScope, $resource,
+                userService) {
 
         var service = {}
-        service.updateToken = updateToken;
-        service.updateUser = updateUser;
         service.getTranscriptomes = getTranscriptomes;
+        service.getCovariances = getCovariances;
         service.transcriptomes = null;
+        service.covariances = null;
         service.error = null;
 
         initialice();
@@ -21,15 +23,15 @@
         function initialice() {
 
 
-            service.updateToken(userService.token);
-            service.updateUser(userService.user);
+            updateToken(userService.token);
+            updateUser(userService.user);
 
             $rootScope.$on(userService.USER_UPDATED_NOTIFICATION, function(event, user) {
-                service.updateUser(user);
+                updateUser(user);
             });
 
             $rootScope.$on(userService.USER_LOGGED_IN_NOTIFICATION, function(event, token){
-                service.updateToken(token);
+                updateToken(token);
             });
         }
 
@@ -49,7 +51,7 @@
             }
         }
 
-        // Returns a promise of active job. In case of error, the promise will be fillled an "{errorMessage;'some error message'}" object
+        // Returns a promise of transcriptomes. In case of error, the promise will be fillled an "{errorMessage;'some error message'}" object
         function getTranscriptomes() {
             var resource = transcriptomeResource();
             var p = resource
@@ -93,6 +95,38 @@
             service.error = {message:message};
             service.transcriptomes = null;
             return service.error;
+        }
+
+        // Returns a promise of covriances. In case of error, the promise will be fillled an "{errorMessage;'some error message'}" object
+        function getCovariances() {
+            var resource = covarianceResource();
+            var p = resource
+                        .get({user_id: service.user.id})
+                        .$promise
+            return p;
+        }
+
+        function covarianceResource() {
+            var resource = $resource("api/covariances/", {}, {
+                get:{
+                    method:"GET",
+                    isArray:true,
+                    interceptor:{response:covariancesSuccessCallback, responseError:covariancesErrorCallback},
+                    headers:{'Authorization':(' Token '+service.token), 'kk':'kk'}
+                },
+            });
+            return resource;
+        }
+
+        function covariancesSuccessCallback(response) {
+            service.covariances = response.data;
+            service.error = null;
+            return service.covariances;
+        }
+
+        function covariancesErrorCallback(response) {
+            message = "Something went wrong with the covariances";
+            return handleError(message, response);
         }
     }
 

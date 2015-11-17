@@ -4,10 +4,11 @@
     <div class="col-md-6 center-component">
       <h2 class="form-heading">Metaxcan Job:{{(vm.job.title && vm.job.title.length) ? vm.job.title : "Untitled job"}}</h2>
       <div ng-if="vm.jobService.job.state != 'created'">Job Status: {{vm.jobService.job.state}}</div>
+      <div ng-if="vm.jobService.job.state == 'failed'">Please check your settings and run again.</div>
     </div>
     <div><span us-spinner="{radius:10, width:4, length: 8}" spinner-key="mp_spinner"></span></div>
   </div>
-  <fieldset ng-disabled="vm.jobService.job.state != 'created'">
+  <fieldset ng-disabled="vm.jobService.job.state != 'created' && vm.jobService.job.state != 'failed'">
   <!-- unindented for laziness-->
   <div class="row">
     <div class="col-md-3"></div>

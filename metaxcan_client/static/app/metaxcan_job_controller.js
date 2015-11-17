@@ -69,16 +69,38 @@
                 var c = vm.covariances[0];
                 vm.parameters.covariance = c.id;
              }
+
+             if (jobService.job.state == "running") {
+                monitorJobState();
+             }
         }
 
         function doStart() {
             jobService.startJob(jobService.job).then(function(result){
                 if (! jobService.error ) {
-                    usSpinnerService.spin('mp_spinner'); //workaround to spinner race condition
+                    monitorJobState();
                 } else {
                     vm.message = jobService.error.message;
                 }
             });
+        }
+
+        function monitorJobState() {
+            usSpinnerService.spin('mp_spinner');
+            $timeout( function(){
+                jobService.getJob(jobService.job.id).then(function(result) {
+                    usSpinnerService.stop('mp_spinner');
+                    if (result && "message" in result) {
+                        vm.message = "Something went wrong, retrying";
+                        monitorJobState();
+                    } else {
+                        vm.message == null;
+                        if (jobService.job.state == "running") {
+                            monitorJobState();
+                        }
+                    }
+                });
+            }, 10000);
         }
 
 /* */

@@ -9,6 +9,7 @@
         var service = {}
         service.updateToken = updateToken;
         service.updateUser = updateUser;
+        service.getJob = getJob
         service.getActiveJob = getActiveJob;
         service.createMetaxcanJob = createMetaxcanJob;
         service.getMetaxcanParameters = getMetaxcanParameters;
@@ -83,6 +84,23 @@
         }
 
 /* Metaxcan Jobs */
+        function getJob(jobId) {
+                var resource = $resource("api/users/:user_id/jobs/:job_id/", {}, {
+                    active:{
+                        method:"GET",
+                        isArray:false,
+                        interceptor:{response:jobSuccessCallback, responseError:jobErrorCallback},
+                        headers:{'Authorization': authorization() }
+                    },
+                });
+
+            var p = resource
+                        .active({user_id: service.user.id, job_id:jobId})
+                        .$promise
+            return p;
+
+        }
+
 
         // Returns a promise of active job. In case of error, the promise will be fillled an "{errorMessage;'some error message'}" object
         function getActiveJob() {

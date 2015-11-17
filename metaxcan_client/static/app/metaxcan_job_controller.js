@@ -3,11 +3,13 @@
 
     /* Controllers */
     angular.module('metaxcanClientControllers')
-        .controller('MetaxcanJobCtrl', ["$scope", "$location", "$timeout", "usSpinnerService", "Upload",
+        .controller('MetaxcanJobCtrl', ["$scope", "$location", "$timeout", "$http",
+            "usSpinnerService", "Upload",
             "jobService", "configurationService", "paths",
             metaxcanJobController]);
 
-    function metaxcanJobController($scope, $location, $timeout, usSpinnerService, Upload,
+    function metaxcanJobController($scope, $location, $timeout, $http,
+                usSpinnerService, Upload,
                 jobService, configurationService, paths){
         var vm = this;
         vm.parameters =  {};
@@ -16,6 +18,7 @@
         vm.covariances = null;
         vm.uploadFiles = uploadFiles
         vm.jobService = jobService
+        vm.onDownloadResults = onDownloadResults
 
         vm.start = start
 
@@ -109,6 +112,23 @@
             angular.forEach(files, function(file) {
                 jobService.uploadJobFile(file)
             });
+        }
+
+/* */
+        function onDownloadResults() {
+            var url = "api/users/"+jobService.user.id+"/jobs/"+jobService.job.id+"/results/"
+            $http({method:'GET',
+                    url:url,
+                    headers:{Authorization:(' Token '+jobService.token)},
+                    responseType: 'blob',
+                    })
+                .then(function success(response){
+                    vm.message = null;
+                    var data = response.data;
+                    saveAs(data, "results.zip");
+                }, function error(response){
+                    vm.message = "Something went wrong with the download";
+                });
         }
     };
 

@@ -1,6 +1,10 @@
 __author__ = 'heroico'
 
+import os
+from django.core.servers.basehttp import FileWrapper
+from django.http import HttpResponse
 from django.utils.translation import ugettext_lazy as _
+from django.conf import settings
 from rest_framework import status
 from rest_framework.settings import api_settings
 from rest_framework.exceptions import PermissionDenied, NotAuthenticated, NotFound, ParseError
@@ -82,8 +86,24 @@ class JobViewSet(AuthenticatedUserMixin,
         data = self.get_serializer(job).data if job else None
         return Response(data)
 
+    @detail_route(methods=['get'])
+    def results(self, request, user_pk, pk=None, *args, **kwargs):
+        user = self.get_authenticated_user()
+        job = self.get_job(pk)
+        if not job.state == JobStateEnum.COMPLETED:
+            raise PermissionDenied(_("Job not completed"))
+        path = job.hierarchy_results_path() + ".zip"
+        path = os.path.join(settings.MEDIA_ROOT, path)
+        if not os.path.exists(path):
+            raise PermissionDenied("Job Results lost")
+        with open(path, 'rb') as file:
+            response = HttpResponse(FileWrapper(file), content_type='application/zip')
+            response['Content-Disposition'] = 'attachment; filename="%s"' % 'results.zip'
+            return response
+
     @detail_route(methods=['get', 'patch'])
     def metaxcan_parameters(self, request, user_pk, pk=None, *args, **kwargs):
+        user = self.get_authenticated_user()
         job = self.get_job(pk)
 
         metaxcan_parameters = job.metaxcan_parameters

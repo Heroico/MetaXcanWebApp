@@ -85,7 +85,13 @@
         }
 
 /* Metaxcan Jobs */
-        function getJobs(offset) {
+        function getJobs(offset, limit) {
+            var resource = jobResource();
+            var p = resource
+                        .get({user_id: service.user.id, offset:offset, limit:limit})
+                        .$promise
+            return p;
+
         }
 
         function getJob(jobId) {
@@ -112,35 +118,6 @@
                         .$promise
             return p;
         }
-
-        function jobSuccessCallback(response) {
-            var job = response.data;
-            if (job && "id" in job) {
-                service.job = job;
-            }
-            service.error = null;
-            return service.job;
-        }
-
-        function jobErrorCallback(response) {
-            message = "Something went wrong with the Job";
-            return handleError(message, response);
-        }
-
-        function handleError(message, response) {
-            if (response != undefined &&
-                typeof response == "object" &&
-                typeof response.data == "object" ) {
-                data = response.data;
-                if ("detail" in data) {
-                    message = data.detail;
-                }
-            }
-            service.error = {message:message};
-            service.job = null;
-            return service.error;
-        }
-
 
         function startJob(job) {
             var resource = jobResource();
@@ -191,13 +168,58 @@
                     interceptor:{response:jobSuccessCallback, responseError:jobErrorCallback},
                     headers:{'Authorization': authorization() }
                 },
+                get:{
+                    method:"GET",
+                    interceptor:{response:jobListSuccessCallback, responseError:jobListErrorCallback},
+                    headers:{'Authorization': authorization() }
+                },
             });
             return resource;
+        }
+
+        function jobSuccessCallback(response) {
+            service.job = null;
+            var job = response.data;
+            if (job && "id" in job) {
+                service.job = job;
+            }
+            service.error = null;
+            return service.job;
+        }
+
+        function jobErrorCallback(response) {
+            message = "Something went wrong with the Job";
+            return handleError(message, response);
+        }
+
+        function handleError(message, response) {
+            if (response != undefined &&
+                typeof response == "object" &&
+                typeof response.data == "object" ) {
+                data = response.data;
+                if ("detail" in data) {
+                    message = data.detail;
+                }
+            }
+            service.error = {message:message};
+            service.job = null;
+            return service.error;
         }
 
         function jobStartErrorCallback(response) {
             message = "Something went wrong when starting the Job";
             return handleError(message, response);
+        }
+
+        function jobListErrorCallback(response) {
+            message = "Something went wrong when requesting job list";
+            return handleError(message, response);
+        }
+
+        function jobListSuccessCallback(response) {
+            results = response.data.results;
+            service.error = null;
+            return results
         }
 
 /* Metaxcan parameters */

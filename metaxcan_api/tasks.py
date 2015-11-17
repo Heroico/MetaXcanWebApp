@@ -27,5 +27,9 @@ def run_metaxcan_job(job_id):
         job.failed()
 
     print("deleting stuff")
-    intermediate = os.path.join(settings.MEDIA_ROOT, job.hierarchy_path())
+    intermediate = os.path.join(settings.MEDIA_ROOT, job.hierarchy_intermediate_path())
     shutil.rmtree(intermediate)
+
+    results = os.path.join(settings.MEDIA_ROOT, job.hierarchy_results_path())
+    zip = results
+    shutil.make_archive(zip, root_dir=results, format="zip")

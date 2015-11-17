@@ -7,6 +7,7 @@ from rest_framework.exceptions import PermissionDenied, NotAuthenticated, NotFou
 from rest_framework.response import Response
 from rest_framework.viewsets import ReadOnlyModelViewSet
 from rest_framework.decorators import list_route, detail_route
+from rest_framework.pagination import LimitOffsetPagination
 from .utilities import AuthenticatedUserMixin, GetJobMixin
 from metaxcan_api.serializers import JobSerializer, MetaxcanParametersSerializer
 from metaxcan_api.permissions import AuthenticatedOwnerPermission
@@ -20,6 +21,7 @@ class JobViewSet(AuthenticatedUserMixin,
                  ReadOnlyModelViewSet):
     serializer_class = JobSerializer
     permission_classes = (AuthenticatedOwnerPermission, )
+    pagination_class = LimitOffsetPagination
 
     def get_queryset(self):
         user = self.get_authenticated_user()
@@ -70,8 +72,8 @@ class JobViewSet(AuthenticatedUserMixin,
     @detail_route(methods=['post'])
     def start(self, request, user_pk, pk=None, *args, **kwargs):
         job = self.get_job(pk)
-        if job.state != JobStateEnum.CREATED:
-            raise PermissionDenied(_("Cannot start job that is already started"))
+        if job.state not in [JobStateEnum.CREATED, JobStateEnum.FAILED]:
+            raise PermissionDenied(_("Cannot start job"))
         job.start()
         if job.metaxcan_parameters and job.metaxcan_parameters.id:
             run_metaxcan_job.delay(pk)

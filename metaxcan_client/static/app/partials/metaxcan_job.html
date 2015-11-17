@@ -2,7 +2,7 @@
   <div class="row">
     <div class="col-md-3"></div>
     <div class="col-md-6 center-component">
-      <h2 class="form-heading">Metaxcan Job:{{(vm.job.title && vm.job.title.length) ? vm.job.title : "Untitled job"}}</h2>
+      <h2 class="form-heading">Metaxcan Job:{{(vm.jobService.job.title && vm.jobService.job.title.length > 0) ? vm.jobService.job.title : "Untitled job"}}</h2>
       <div ng-if="vm.jobService.job.state != 'created'">Job Status: {{vm.jobService.job.state}}</div>
       <div ng-if="vm.jobService.job.state == 'failed'">Please check your settings and run again.</div>
     </div>

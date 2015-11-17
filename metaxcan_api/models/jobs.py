@@ -55,7 +55,7 @@ class Job(models.Model):
         self.state = JobStateEnum.COMPLETED
         self.save()
 
-    def saved(self):
+    def failed(self):
         if self.state != JobStateEnum.RUNNING:
             raise Exception(_("Can't fail that which is not running"))
         self.state = JobStateEnum.FAILED
@@ -65,8 +65,6 @@ class Job(models.Model):
     def hierarchy_path(self):
         user = self.owner
         hierarchy = os.path.join(str(user.id), str(self.id))
-        if not os.path.exists(hierarchy):
-            os.makedirs(hierarchy)
         return hierarchy
 
     def hierarchy_input_files_path(self):
@@ -81,6 +79,4 @@ class Job(models.Model):
     def make_subpath(self, sub_path):
         path = self.hierarchy_path()
         path = os.path.join(path, sub_path)
-        if not os.path.exists(path):
-            os.makedirs(path)
         return path

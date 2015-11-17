@@ -9,6 +9,7 @@
         var service = {}
         service.updateToken = updateToken;
         service.updateUser = updateUser;
+        service.getJobs = getJobs
         service.getJob = getJob
         service.getActiveJob = getActiveJob;
         service.createMetaxcanJob = createMetaxcanJob;
@@ -84,35 +85,20 @@
         }
 
 /* Metaxcan Jobs */
-        function getJob(jobId) {
-                var resource = $resource("api/users/:user_id/jobs/:job_id/", {}, {
-                    active:{
-                        method:"GET",
-                        isArray:false,
-                        interceptor:{response:jobSuccessCallback, responseError:jobErrorCallback},
-                        headers:{'Authorization': authorization() }
-                    },
-                });
-
-            var p = resource
-                        .active({user_id: service.user.id, job_id:jobId})
-                        .$promise
-            return p;
-
+        function getJobs(offset) {
         }
 
+        function getJob(jobId) {
+            var resource = jobResource();
+            var p = resource
+                        .get_job({user_id: service.user.id, job_id:jobId})
+                        .$promise
+            return p;
+        }
 
         // Returns a promise of active job. In case of error, the promise will be fillled an "{errorMessage;'some error message'}" object
         function getActiveJob() {
-            var resource = $resource("api/users/:user_id/jobs/active/", {}, {
-                active:{
-                    method:"GET",
-                    isArray:false,
-                    interceptor:{response:jobSuccessCallback, responseError:jobErrorCallback},
-                    headers:{'Authorization': authorization() }
-                },
-            });
-
+            var resource = jobResource();
             var p = resource
                         .active({user_id: service.user.id})
                         .$promise
@@ -120,15 +106,7 @@
         }
 
         function createMetaxcanJob(parameters) {
-            var resource = $resource("api/users/:user_id/jobs/create_metaxcan/", {}, {
-                create_metaxcan:{
-                    method:"POST",
-                    isArray:false,
-                    interceptor:{response:jobSuccessCallback, responseError:jobErrorCallback},
-                    headers:{'Authorization': authorization() }
-                },
-            });
-
+            var resource = jobResource();
             var p = resource
                         .create_metaxcan({user_id: service.user.id}, parameters)
                         .$promise
@@ -173,7 +151,7 @@
         }
 
         function jobResource() {
-            var resource = $resource("api/users/:user_id/jobs/:job_id/", {}, {
+            var resource = $resource("api/users/:user_id/jobs/", {}, {
                 get_metaxcan_parameters: {
                     url:"api/users/:user_id/jobs/:job_id/metaxcan_parameters/",
                     method:"GET",
@@ -190,6 +168,27 @@
                     url:"api/users/:user_id/jobs/:job_id/start/",
                     method:"POST",
                     interceptor:{response: jobSuccessCallback, responseError:jobStartErrorCallback},
+                    headers:{'Authorization': authorization() }
+                },
+                create_metaxcan:{
+                    url:"api/users/:user_id/jobs/create_metaxcan/",
+                    method:"POST",
+                    isArray:false,
+                    interceptor:{response:jobSuccessCallback, responseError:jobErrorCallback},
+                    headers:{'Authorization': authorization() }
+                },
+                active:{
+                    url:"api/users/:user_id/jobs/active/",
+                    method:"GET",
+                    isArray:false,
+                    interceptor:{response:jobSuccessCallback, responseError:jobErrorCallback},
+                    headers:{'Authorization': authorization() }
+                },
+                get_job:{
+                    url:"api/users/:user_id/jobs/:job_id/",
+                    method:"GET",
+                    isArray:false,
+                    interceptor:{response:jobSuccessCallback, responseError:jobErrorCallback},
                     headers:{'Authorization': authorization() }
                 },
             });

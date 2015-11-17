@@ -3,6 +3,8 @@ from __future__ import absolute_import
 from celery import shared_task
 from metaxcan_api.models import Job, MetaxcanParameters
 from subprocess import call
+from django.conf import settings
+import os
 import shutil
 
 
@@ -25,4 +27,5 @@ def run_metaxcan_job(job_id):
         job.failed()
 
     print("deleting stuff")
-    shutil.rmtree(job.hierarchy_intermediate_path())
+    intermediate = os.path.join(settings.MEDIA_ROOT, job.hierarchy_path())
+    shutil.rmtree(intermediate)

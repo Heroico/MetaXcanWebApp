@@ -1,11 +1,11 @@
 (function(){
     angular.module('metaxcanClientServices')
         .factory('jobService',
-        ['$rootScope', '$resource', "$timeout",
+        ['$rootScope', '$resource', "$timeout", "$http",
         'userService', 'Upload',
          jobService])
 
-    function jobService($rootScope, $resource, $timeout, userService, Upload){
+    function jobService($rootScope, $resource, $timeout, $http, userService, Upload){
         var service = {}
         service.updateToken = updateToken;
         service.updateUser = updateUser;
@@ -17,6 +17,7 @@
         service.updateMetaxcanParameters = updateMetaxcanParameters;
         service.getJobFiles = getJobFiles
         service.uploadJobFile = uploadJobFile
+        service.deleteJobFile = deleteJobFile
         service.startJob = startJob
         service.JOB_SERVICE_READY_NOTIFICATION = "jobs:ready";
         service.JOB_SERVICE_DOWN_NOTIFICATION = "jobs:down";
@@ -222,6 +223,7 @@
             return results
         }
 
+
 /* Metaxcan parameters */
 
         function getMetaxcanParameters(job) {
@@ -332,6 +334,25 @@
             });
 
             return p;
+        }
+
+        function deleteJobFile(f) {
+            path = buildJobFilesPath();
+            path = path +f.id+"/"
+            $http({method:'DELETE',
+                    url:path,
+                    headers:{Authorization: authorization()}
+                    })
+                .then(function success(response){
+                    service.error = null;
+                    service.files = _.reject(service.files, function(el){ return el.id == f.id})
+                    return response
+                }, function error(response){
+                    message = "Something went wrong with the download";
+                    console.log(JSON.stringify(response.data))
+                    handleError(message, response);
+                    return response
+                });
         }
 
         function checkDupFile(f) {

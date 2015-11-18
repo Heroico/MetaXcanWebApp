@@ -43,8 +43,11 @@ class Job(models.Model):
         return None
 
 # crude state machine
+    def safe_for_run(self):
+        return self.state in [JobStateEnum.CREATED, JobStateEnum.FAILED]
+
     def start(self):
-        if self.state not in [JobStateEnum.CREATED, JobStateEnum.FAILED]:
+        if not self.safe_for_run():
             raise Exception(_("Can't start that which already is started"))
         self.state = JobStateEnum.RUNNING
         self.save()

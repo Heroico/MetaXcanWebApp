@@ -76,7 +76,7 @@ class JobViewSet(AuthenticatedUserMixin,
     @detail_route(methods=['post'])
     def start(self, request, user_pk, pk=None, *args, **kwargs):
         job = self.get_job(pk)
-        if job.state not in [JobStateEnum.CREATED, JobStateEnum.FAILED]:
+        if not job.safe_for_run():
             raise PermissionDenied(_("Cannot start job"))
         job.start()
         if job.metaxcan_parameters and job.metaxcan_parameters.id:
@@ -114,6 +114,9 @@ class JobViewSet(AuthenticatedUserMixin,
             return self.response_metaxcan_data(metaxcan_parameters=metaxcan_parameters)
 
         if request.method == 'PATCH':
+            if not job.safe_for_run():
+                raise PermissionDenied(_("Cannot modify parameters"))
+
             return self.partial_update_metaxcan_data(request, metaxcan_parameters)
 
     def response_metaxcan_data(self, metaxcan_parameters=None, serializer=None):

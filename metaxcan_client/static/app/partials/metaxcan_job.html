@@ -105,7 +105,7 @@
           {{f.name}} {{f.error}} {{f.$error}} {{f.$errorParam}}
         </li>
         <li ng-repeat="f in vm.jobService.files" style="font:smaller">
-          {{f.name}} <button align="left" class="btn btn-default btn-delete" ng-click="vm.jobService.deleteJobFile(f)">delete</button>
+          {{f.name}} <button ng-if="vm.jobService.job.state != 'completed'" align="left" class="btn btn-default btn-delete" ng-click="vm.jobService.deleteJobFile(f)">delete</button>
         </li>
       </ul>
     </div>

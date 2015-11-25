@@ -33,7 +33,7 @@
     function configResourceProvider($resourceProvider){
         // Don't strip trailing slashes from calculated URLs
         $resourceProvider.defaults.stripTrailingSlashes = false;
-    }
+    };
 
     function configRouteProvider($routeProvider) {
         $routeProvider.
@@ -60,6 +60,6 @@
             otherwise({
                 redirectTo: '/home'
             });
-  }
+    };
 
 })();

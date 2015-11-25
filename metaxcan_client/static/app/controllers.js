@@ -1,4 +1,4 @@
-(function(){stop
+(function(){
     'use strict';
 
     /* Controllers */
@@ -15,7 +15,7 @@
         });
 
         vm.deregister_user_logged_in = $scope.$on(userService.USER_LOGGED_IN_NOTIFICATION, function(event) {
-            vm.loggedin = true
+            vm.loggedin = true;
         });
     };
 

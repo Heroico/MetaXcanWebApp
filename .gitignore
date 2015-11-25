@@ -19,3 +19,6 @@ static_files/
 
 #uploaded files
 uploaded_files/
+
+#pyenv
+.python-version

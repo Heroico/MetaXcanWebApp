@@ -2,6 +2,16 @@
 ;  celery worker supervisor example
 ; ==================================
 
+; after copying to supervisor folder:
+; $ sudo supervisorctl reread
+; $ sudo supervisorctl update
+
+; useful commands
+; $ sudo supervisorctl status hello
+; $ sudo supervisorctl stop hello
+; $ sudo supervisorctl start hello
+; $ sudo supervisorctl restart hello
+
 [program:celery]
 ; Set full path to celery program if using virtualenv
 command=celery worker -A proj --loglevel=INFO

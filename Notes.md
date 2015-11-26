@@ -29,7 +29,7 @@ $ python manage.py runserver
 
 
 - **SECRET KEY must be changed in production**
-- If Celery and Django are installed in different environments, theier working folder must be shared/mounted in both.
+- If Celery and Django are installed in different environments, their working folder must be shared/mounted in both.
 - You must setup transcriptomes and covariances.
 ```
 $ python manage.py shell
@@ -38,6 +38,8 @@ $ python manage.py shell
 > c.save()
 
 ```
+- Permissions, permissions.
+If Celery and Django are on different users, files and folders need to be accessible to both.
 
 Node And JS Garbage
 -------------------

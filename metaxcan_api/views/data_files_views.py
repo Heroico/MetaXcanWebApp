@@ -54,7 +54,7 @@ class DataFileViewSet(AuthenticatedUserMixin,
         hierarchy = job.hierarchy_input_files_path()
         path = os.path.join(root, hierarchy)
         if not os.path.exists(path):
-            os.makedirs(path)
+            os.makedirs(path, mode=0o774)
         name = os.path.join(hierarchy, file.file.name)
         file.file.name = name
 

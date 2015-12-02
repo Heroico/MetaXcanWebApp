@@ -48,6 +48,7 @@ class MetaxcanParameters(models.Model):
         command += " --gwas_folder " + os.path.join(settings.MEDIA_ROOT, job.hierarchy_input_files_path())
         command += " --output_folder " + os.path.join(settings.MEDIA_ROOT, job.hierarchy_intermediate_path())
         command += " --weight_db_path " + self.transcriptome.path
+        command += " --throw"
 
         return command
 
@@ -65,5 +66,6 @@ class MetaxcanParameters(models.Model):
         results_path = os.path.join(settings.MEDIA_ROOT, job.hierarchy_results_path())
         results_path = os.path.join(results_path, "results.csv")
         command += " --output_file " + results_path
+        command += " --throw"
 
         return command

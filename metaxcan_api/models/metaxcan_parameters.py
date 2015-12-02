@@ -30,8 +30,9 @@ class MetaxcanParameters(models.Model):
 
         if job.metaxcan_parameters.compressed:
             command += " --compressed"
-        if self.separator and len(self.separator):
-            command += " --separator " + self.separator
+        if self.separator and len(self.separator) and not self.separator in ["TAB", "\t", "\\t"]:
+            # BEcause, you know, "\t" is whitespace and MetaXcan treats it that way.
+            command += " --separator '" + self.separator + "'"
         command += " --a1_column " + self.other_allele_column
         command += " --a2_column " + self.effect_allele_column
         command += " --snp_column " + self.snp_column

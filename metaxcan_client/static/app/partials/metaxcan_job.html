@@ -67,6 +67,8 @@
     <div class="col-md-1 center-component">
       <div class="form-control-wrapper">Transcriptome Model</div>
       <div class="form-control-wrapper">Covariance</div>
+      <div class="form-control-wrapper">Column Separator</div>
+      <div class="form-control-wrapper"></div>
     </div>
     <div class="col-md-3 center-component">
       <div class="form-control-wrapper">
@@ -79,13 +81,14 @@
           <option ng-repeat="c in vm.covariances" value="{{c.id}}">{{c.name}}</option>
         </select>
       </div>
+      <div class="form-control-wrapper">
+        <select ng-model="vm.separatorOption" class="form-control" id="separatorSelect">
+          <option ng-repeat="s in vm.separatorOptions" value="{{s.key}}">{{s.name}}</option>
+        </select>
+        {{JSON.stringify(vm.parameters.separatorOption)}}
+      </div>
       <div class="left-to-center">
         <input type="checkbox"  ng-model="vm.parameters.compressed"> Files Are GZipped Compressed
-      </div>
-      <div class="form-control-wrapper">
-        <input ng-model="vm.parameters.separator" type="text" class="form-control" id="separator">
-        <div class="floating-label">Separator character</div>
-        <span class="material-input"></span>
       </div>
     </div>
   </div>

@@ -5,12 +5,12 @@
     angular.module('metaxcanClientControllers')
         .controller('MetaxcanJobCtrl', ["$scope", "$location", "$timeout", "$http",
             "usSpinnerService", "Upload",
-            "jobService", "configurationService", "paths",
+            "jobService", "configurationService", "paths", "columnSeparatorOptions",
             metaxcanJobController]);
 
     function metaxcanJobController($scope, $location, $timeout, $http,
                 usSpinnerService, Upload,
-                jobService, configurationService, paths){
+                jobService, configurationService, paths, columnSeparatorOptions){
         var vm = this;
         vm.parameters =  {};
         vm.message = null;
@@ -34,6 +34,7 @@
                 $timeout(function() { usSpinnerService.spin('mp_spinner');}, 100); //workaround to spinner race condition
             }
 
+            vm.separatorOptions = columnSeparatorOptions;
             vm.transcriptomes = configurationService.transcriptomes;
             vm.covariances = configurationService.covariances;
             parametersUpdated(jobService.metaxcanParameters);
@@ -42,6 +43,13 @@
         function start() {
             usSpinnerService.spin('mp_spinner');
             vm.message = "Updating parameters";
+
+            var found = _.find(vm.separatorOptions, function(el){ return el.key === vm.separatorOption; });
+            if (!found) {
+                found = separatorOptions[0];
+            }
+            vm.parameters.separator = found.value;
+
             jobService.updateMetaxcanParameters(vm.jobService.job, vm.parameters).then(updateParametersCallback);
         }
 
@@ -71,6 +79,11 @@
              if (vm.parameters.covariance == null) {
                 var c = vm.covariances[0];
                 vm.parameters.covariance = c.id;
+             }
+
+             if (vm.separatorOption == null) {
+                var s = vm.separatorOptions[0];
+                vm.separatorOption = s.key;
              }
 
              if (jobService.job.state == "running") {

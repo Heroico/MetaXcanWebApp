@@ -356,13 +356,13 @@
         }
 
         function checkDupFile(f) {
-            var found = _.find(service.files, function(el){ return el.name === f.name; })
+            var found = _.find(service.files, function(el){ return el.name === f.name; });
             if (found) return false;
 
-            found = _.find(service.uploadFiles, function(el){ return el.name === f.name; })
+            found = _.find(service.uploadFiles, function(el){ return el.name === f.name; });
             if (found) return false;
 
-            found = _.find(service.failedFiles, function(el){ return el.name === f.name; })
+            found = _.find(service.failedFiles, function(el){ return el.name === f.name; });
             if (found) return false;
 
             return true

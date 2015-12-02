@@ -6,6 +6,10 @@
 
     angular
         .module('metaxcan_client', ['metaxcanClientControllers', 'ngRoute', 'ngResource', 'ngDialog'])
+        .constant("columnSeparatorOptions", [
+            {key:"whitespace", name:"Any Whitespace (including spaces or tabs)", value:"" },
+            {key:"comma", name:"Comma", value:","}
+        ])
         .constant('paths',
             {home:HOME_PATH,
              metaxcan_job_path:METAXCAN_JOB_PATH,

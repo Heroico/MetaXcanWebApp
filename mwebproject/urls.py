@@ -19,7 +19,7 @@ from metaxcan_api import urls as api_urls
 from metaxcan_client import urls as client_urls
 
 urlpatterns = [
-    url(r'^api/', include(api_urls)),
-    url(r'^app/', include(client_urls)),
-    url(r'^admin/', include(admin.site.urls)),
+    url(r'^metaxcan/api/', include(api_urls)),
+    url(r'^metaxcan/app/', include(client_urls)),
+    url(r'^metaxcan/admin/', include(admin.site.urls)),
 ]

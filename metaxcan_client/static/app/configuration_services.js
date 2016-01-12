@@ -61,7 +61,7 @@
         }
 
         function transcriptomeResource() {
-            var resource = $resource("api/transcriptomes/", {}, {
+            var resource = $resource("metaxcan/api/transcriptomes/", {}, {
                 get:{
                     method:"GET",
                     isArray:true,
@@ -107,7 +107,7 @@
         }
 
         function covarianceResource() {
-            var resource = $resource("api/covariances/", {}, {
+            var resource = $resource("metaxcan/api/covariances/", {}, {
                 get:{
                     method:"GET",
                     isArray:true,

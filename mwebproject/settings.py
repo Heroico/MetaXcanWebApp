@@ -140,7 +140,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
 STATIC_ROOT = os.path.join(BASE_DIR,'static_files')
-STATIC_URL = '/static/'
+STATIC_URL = '/metaxcan/static/'
 
 MEDIA_ROOT = "uploaded_files"
 MEDIA_URL = "/uploaded_files/"
@@ -155,4 +155,3 @@ CELERY_RESULT_SERIALIZER = 'json'
 
 METAXCAN_SOFTWARE = "/home/heroico/Documents/Projects/Chicago/MetaXcan/working/software"
 METAXCAN_PYTHON = "/home/heroico/.pyenv/versions/2.7.6/bin/python"
-

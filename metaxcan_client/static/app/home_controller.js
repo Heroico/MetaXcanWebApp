@@ -120,7 +120,7 @@
 /* Create Metaxcan job event */
         function onCreateMetaxcan() {
             var dialog = ngDialog.open({
-                template: 'static/app/dialogs/new_metaxcan_dialog.html',
+                template: 'metaxcan/static/app/dialogs/new_metaxcan_dialog.html',
                 controller: ['$scope', function($scope) {
                     //sigh, old style, "controllerAs" is not working
                     $scope.parameters = {

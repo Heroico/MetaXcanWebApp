@@ -26,22 +26,22 @@
     function configRouteProvider($routeProvider) {
         $routeProvider.
             when("/"+HOME_PATH, {
-                templateUrl: 'static/app/partials/home.html',
+                templateUrl: 'metaxcan/static/app/partials/home.html',
                 controller: 'HomeCtrl',
                 controllerAs: 'vm'
               }).
             when('/'+LOGIN_PATH, {
-                templateUrl: 'static/app/partials/login.html',
+                templateUrl: 'metaxcan/static/app/partials/login.html',
                 controller: 'LoginCtrl',
                 controllerAs: 'vm',
             }).
             when('/'+SIGN_UP_PATH, {
-                templateUrl: 'static/app/partials/signup.html',
+                templateUrl: 'metaxcan/static/app/partials/signup.html',
                 controller: 'SignUpCtrl',
                 controllerAs: 'vm',
             }).
             when("/"+METAXCAN_JOB_PATH,{
-                templateUrl: 'static/app/partials/metaxcan_job.html',
+                templateUrl: 'metaxcan/static/app/partials/metaxcan_job.html',
                 controller: 'MetaxcanJobCtrl',
                 controllerAs: 'vm',
             }).

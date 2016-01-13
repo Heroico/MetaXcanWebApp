@@ -129,7 +129,7 @@
 
 /* */
         function onDownloadResults() {
-            var url = "api/users/"+jobService.user.id+"/jobs/"+jobService.job.id+"/results/"
+            var url = "metaxcan/api/users/"+jobService.user.id+"/jobs/"+jobService.job.id+"/results/"
             $http({method:'GET',
                     url:url,
                     headers:{Authorization:(' Token '+jobService.token)},

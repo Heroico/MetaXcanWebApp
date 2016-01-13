@@ -129,41 +129,41 @@
         }
 
         function jobResource() {
-            var resource = $resource("api/users/:user_id/jobs/", {}, {
+            var resource = $resource("metaxcan/api/users/:user_id/jobs/", {}, {
                 get_metaxcan_parameters: {
-                    url:"api/users/:user_id/jobs/:job_id/metaxcan_parameters/",
+                    url:"metaxcan/api/users/:user_id/jobs/:job_id/metaxcan_parameters/",
                     method:"GET",
                     interceptor:{response: metaxcanParametersSuccessCallback, responseError:metaxcanErrorCallback},
                     headers:{'Authorization': authorization() }
                 },
                 patch_metaxcan_parameters:{
-                    url:"api/users/:user_id/jobs/:job_id/metaxcan_parameters/",
+                    url:"metaxcan/api/users/:user_id/jobs/:job_id/metaxcan_parameters/",
                     method:"PATCH",
                     interceptor:{response: metaxcanParametersSuccessCallback, responseError:metaxcanErrorCallback},
                     headers:{'Authorization': authorization() }
                 },
                 start_job:{
-                    url:"api/users/:user_id/jobs/:job_id/start/",
+                    url:"metaxcan/api/users/:user_id/jobs/:job_id/start/",
                     method:"POST",
                     interceptor:{response: jobSuccessCallback, responseError:jobStartErrorCallback},
                     headers:{'Authorization': authorization() }
                 },
                 create_metaxcan:{
-                    url:"api/users/:user_id/jobs/create_metaxcan/",
+                    url:"metaxcan/api/users/:user_id/jobs/create_metaxcan/",
                     method:"POST",
                     isArray:false,
                     interceptor:{response:jobSuccessCallback, responseError:jobErrorCallback},
                     headers:{'Authorization': authorization() }
                 },
                 active:{
-                    url:"api/users/:user_id/jobs/active/",
+                    url:"metaxcan/api/users/:user_id/jobs/active/",
                     method:"GET",
                     isArray:false,
                     interceptor:{response:jobSuccessCallback, responseError:jobErrorCallback},
                     headers:{'Authorization': authorization() }
                 },
                 get_job:{
-                    url:"api/users/:user_id/jobs/:job_id/",
+                    url:"metaxcan/api/users/:user_id/jobs/:job_id/",
                     method:"GET",
                     isArray:false,
                     interceptor:{response:jobSuccessCallback, responseError:jobErrorCallback},
@@ -268,7 +268,7 @@
         }
 
         function filesResource() {
-                var resource = $resource("api/users/:user_id/jobs/:job_id/files/", {}, {
+                var resource = $resource("metaxcan/api/users/:user_id/jobs/:job_id/files/", {}, {
                 get_files: {
                     method:"GET",
                     isArray:true,
@@ -369,7 +369,7 @@
         }
 
         function buildJobFilesPath() {
-            path = "api/users/"+
+            path = "metaxcan/api/users/"+
                 service.user.id +
                 "/jobs/"+
                 service.job.id+

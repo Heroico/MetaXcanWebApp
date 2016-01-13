@@ -153,6 +153,6 @@ CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 
-#Didn't find a lean way of switching this to something either in Celery domain, or in loca lsettings. Sigh. TODO: look again later
+#Didn't find a lean way of switching this to something either in Celery domain, or in local settings. Sigh. TODO: look again later
 METAXCAN_SOFTWARE = "/home/heroico/Documents/Projects/Chicago/MetaXcan/working/software"
 METAXCAN_PYTHON = "/home/heroico/.pyenv/versions/2.7.6/bin/python"

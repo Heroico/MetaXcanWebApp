@@ -61,6 +61,9 @@ class JobViewSet(AuthenticatedUserMixin,
             return {}
 
     def create_job(self, request, *args, **kwargs):
+        #we default to "untitled" for the job
+        if not "title" in request.data or request.data["title"] == None or request.data["title"] == "":
+            request.data["title"] = "untitled"
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = self.get_authenticated_user()

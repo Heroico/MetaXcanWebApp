@@ -61,7 +61,7 @@ class MetaxcanParameters(models.Model):
         command = p + " " + m
 
         command += " --weight_db_path " + self.transcriptome.path
-        command += " --covariance_folder " + self.covariance.path
+        command += " --covariance " + self.covariance.path
         command += " --beta_folder " + os.path.join(settings.MEDIA_ROOT, job.hierarchy_intermediate_path())
 
         results_path = os.path.join(settings.MEDIA_ROOT, job.hierarchy_results_path())
